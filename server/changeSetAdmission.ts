@@ -5,6 +5,7 @@ import {
   referencedGroupIds,
   referencedQuestionIds,
   referencedFeedbackIds,
+  referencedAnnotationIds,
   referencedSectionIds,
   type ChangeSet,
 } from '../src/model/changeset'
@@ -74,8 +75,9 @@ function targetValidation(
     ...referencedGroupIds(changeSet).filter((id) => !isShape(id, 'group')),
     ...referencedQuestionIds(changeSet).filter((id) => !isShape(id, 'question')),
     ...referencedFeedbackIds(changeSet).filter((id) => !isShape(id, 'feedback')),
+    ...referencedAnnotationIds(changeSet).filter((id) => !isShape(id, 'question') && !isShape(id, 'feedback')),
     ...changeSet.ops.flatMap((op) => {
-      const target = op.kind === 'set_comment_summary'
+      const target = op.kind === 'set_comment_summary' || op.kind === 'resolve_comment'
         ? { cardId: op.cardId, commentId: op.commentId }
         : op.kind === 'append_annotation_message' && op.target.kind === 'card'
           ? { cardId: op.target.cardId, commentId: op.target.commentId }

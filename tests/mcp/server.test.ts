@@ -39,6 +39,7 @@ test('the MCP server exposes the scoped tools plus list_projects, and no text-ed
   const names = tools.map((t) => t.name).sort()
   expect(names).toEqual([
     'add_comment',
+    'brace_comment',
     'complete_review',
     'create_feedback',
     'create_figure_card',
@@ -53,12 +54,14 @@ test('the MCP server exposes the scoped tools plus list_projects, and no text-ed
     'list_projects',
     'list_reviews',
     'merge_notes',
+    'move_annotations',
     'move_cards',
     'move_sections',
     'read_cards',
     'read_draft',
     'read_map',
     'read_selection',
+    'resolve_comment',
     'resolve_feedback',
     'start_review',
     'ungroup_cards',

@@ -23,6 +23,8 @@ export type Op =
   | { kind: 'create_question'; text: string; x: number; y: number }
   | { kind: 'create_feedback'; text: string; x: number; y: number; feedback: { type: CommentType | null; reviewId?: string | null; reviewer?: PersonalityId | null; cardIds?: string[] } }
   | { kind: 'resolve_feedback'; feedbackId: string }
+  | { kind: 'resolve_comment'; cardId: string; commentId: string }
+  | { kind: 'move_annotations'; moves: { id: string; x: number; y: number }[] }
   | {
       kind: 'append_annotation_message'
       target: { kind: 'card'; cardId: string; commentId: string } | { kind: 'feedback'; feedbackId: string }
@@ -213,6 +215,13 @@ function isOp(v: unknown): v is Op {
         ))
     }
     case 'resolve_feedback': return typeof op.feedbackId === 'string'
+    case 'resolve_comment': return typeof op.cardId === 'string' && typeof op.commentId === 'string'
+    case 'move_annotations':
+      return Array.isArray(op.moves) && op.moves.length > 0 && op.moves.every((m) => {
+        if (typeof m !== 'object' || m === null) return false
+        const mm = m as Record<string, unknown>
+        return typeof mm.id === 'string' && isFiniteNumber(mm.x) && isFiniteNumber(mm.y)
+      })
     case 'append_annotation_message': return isAnnotationTarget(op.target) && isAnnotationMessage(op.message)
     case 'group_cards':
       return Array.isArray(op.cardIds) && op.cardIds.length >= 2 &&
@@ -329,6 +338,8 @@ export function changeSetWritesText(cs: ChangeSet): boolean {
       case 'create_question':
       case 'create_feedback':
       case 'resolve_feedback':
+      case 'resolve_comment':
+      case 'move_annotations':
       case 'append_annotation_message':
       case 'group_cards':
       case 'ungroup_cards':
@@ -372,6 +383,7 @@ export function referencedCardIds(cs: ChangeSet): string[] {
     else if (op.kind === 'delete_card') ids.push(op.cardId)
     else if (op.kind === 'append_annotation_message' && op.target.kind === 'card') ids.push(op.target.cardId)
     else if (op.kind === 'create_feedback' && op.feedback.cardIds) ids.push(...op.feedback.cardIds)
+    else if (op.kind === 'resolve_comment') ids.push(op.cardId)
   }
   return ids
 }
@@ -426,6 +438,15 @@ export function referencedQuestionIds(cs: ChangeSet): string[] {
     if (op.kind === 'set_question_summary') ids.push(op.questionId)
   }
   return ids
+}
+
+/**
+ * Ids a move_annotations op names. Each must be an existing question or
+ * floating feedback shape — the server checks both types, since one move can
+ * carry either.
+ */
+export function referencedAnnotationIds(cs: ChangeSet): string[] {
+  return cs.ops.flatMap((op) => op.kind === 'move_annotations' ? op.moves.map((m) => m.id) : [])
 }
 
 export function referencedFeedbackIds(cs: ChangeSet): string[] {

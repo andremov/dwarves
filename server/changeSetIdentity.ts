@@ -91,6 +91,9 @@ function projectOp(op: Op): Op {
         ...(op.feedback.cardIds ? { cardIds: [...op.feedback.cardIds] } : {}),
       } }
     case 'resolve_feedback': return { kind: 'resolve_feedback', feedbackId: op.feedbackId }
+    case 'resolve_comment': return { kind: 'resolve_comment', cardId: op.cardId, commentId: op.commentId }
+    case 'move_annotations':
+      return { kind: 'move_annotations', moves: op.moves.map(({ id, x, y }) => ({ id, x, y })) }
     case 'append_annotation_message': return {
       kind: 'append_annotation_message',
       target: op.target.kind === 'card'

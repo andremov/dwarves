@@ -4,7 +4,7 @@ import { CardShape } from '../shapes/CardShapeUtil'
 import { SectionShape } from '../shapes/SectionShapeUtil'
 import { QuestionShape } from '../shapes/QuestionShapeUtil'
 import { FeedbackShape } from '../shapes/FeedbackShapeUtil'
-import { makeComment, addComment, appendThreadMessage, estimateCommentHeight } from '../model/comments'
+import { makeComment, addComment, appendThreadMessage, estimateCommentHeight, resolveComment } from '../model/comments'
 import { makeNoteCardProps, makeReferenceCardProps, makeFigureCardProps, claudeMayEditCardText } from '../model/cards'
 import { reattribute } from '../model/attribution'
 import { makeSectionProps } from '../model/sections'
@@ -241,6 +241,27 @@ function applyCreateFeedback(editor: Editor, op: Extract<Op, { kind: 'create_fee
   return [id]
 }
 
+function applyResolveComment(editor: Editor, op: Extract<Op, { kind: 'resolve_comment' }>): TLShapeId[] {
+  const shape = editor.getShape(op.cardId as CardShape['id']) as CardShape | undefined
+  if (!shape) return []
+  editor.updateShape<CardShape>({
+    id: shape.id, type: 'card', props: { comments: resolveComment(shape.props.comments, op.commentId) },
+  })
+  return [shape.id]
+}
+
+function applyMoveAnnotations(editor: Editor, op: Extract<Op, { kind: 'move_annotations' }>): TLShapeId[] {
+  const moved: TLShapeId[] = []
+  for (const m of op.moves) {
+    const shape = editor.getShape(m.id as TLShapeId)
+    if (shape && (shape.type === 'question' || shape.type === 'feedback')) {
+      editor.updateShape({ id: shape.id, type: shape.type, x: m.x, y: m.y })
+      moved.push(shape.id)
+    }
+  }
+  return moved
+}
+
 function applyResolveFeedback(editor: Editor, op: Extract<Op, { kind: 'resolve_feedback' }>): TLShapeId[] {
   const shape = editor.getShape(op.feedbackId as FeedbackShape['id']) as FeedbackShape | undefined
   if (!shape) return []
@@ -374,6 +395,8 @@ function applyOp(editor: Editor, op: Op, author: string, acceptedTokenStamp?: st
       return applyCreateQuestion(editor, op, author, acceptedTokenStamp)
     case 'create_feedback': return applyCreateFeedback(editor, op, author, acceptedTokenStamp)
     case 'resolve_feedback': return applyResolveFeedback(editor, op)
+    case 'resolve_comment': return applyResolveComment(editor, op)
+    case 'move_annotations': return applyMoveAnnotations(editor, op)
     case 'append_annotation_message': return applyAppendAnnotationMessage(editor, op)
     case 'group_cards':
       return applyGroupCards(editor, op)

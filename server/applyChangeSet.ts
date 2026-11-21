@@ -2,7 +2,7 @@ import { createShapeId } from '@tldraw/tlschema'
 import { getIndexAbove, IndexKey } from '@tldraw/utils'
 import type { CanvasSnapshot } from './store'
 import { CHANGE_SET_STAMP_META_KEY, ChangeSet, planMerge } from '../src/model/changeset'
-import { makeComment, addComment, appendThreadMessage } from '../src/model/comments'
+import { makeComment, addComment, appendThreadMessage, resolveComment } from '../src/model/comments'
 import {
   makeNoteCardProps, makeReferenceCardProps, makeFigureCardProps, claudeMayEditCardText,
   CARD_DEFAULT_W, CARD_DEFAULT_H,
@@ -406,6 +406,21 @@ export function applyChangeSetToSnapshot(
       case 'resolve_feedback': {
         const shape = findFeedbackShape(store, op.feedbackId)
         if (shape) shape.props.resolved = true
+        break
+      }
+      case 'resolve_comment': {
+        const shape = findCardShape(store, op.cardId)
+        if (shape) shape.props.comments = resolveComment(shape.props.comments ?? [], op.commentId)
+        break
+      }
+      case 'move_annotations': {
+        for (const m of op.moves) {
+          const shape = findQuestionShape(store, m.id) ?? findFeedbackShape(store, m.id)
+          if (shape) {
+            shape.x = m.x
+            shape.y = m.y
+          }
+        }
         break
       }
       case 'group_cards': {

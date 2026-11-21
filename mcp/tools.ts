@@ -2,6 +2,7 @@ import type { ChangeSet, Op } from '../src/model/changeset'
 import type { CommentType, Reference, RefType } from '../src/model/types'
 import type { CardDigest, CardMap } from '../server/digest'
 import type { ReadDraftBlock } from '../src/model/draft'
+import { threadMessages } from '../src/model/comments'
 import { minimalReference } from '../server/unfurl'
 import {
   readCardMap, readCards, readDraft, readSelection, postChangeSet, unfurlReference, listProjects,
@@ -314,6 +315,64 @@ export function resolveFeedbackTool(
 ): Promise<void> {
   return postChangeSet(baseUrl, projectId, makeChangeSet([
     { kind: 'resolve_feedback', feedbackId },
+  ]))
+}
+
+export function resolveCommentTool(
+  baseUrl: string,
+  projectId: string,
+  cardId: string,
+  commentId: string,
+): Promise<void> {
+  return postChangeSet(baseUrl, projectId, makeChangeSet([
+    { kind: 'resolve_comment', cardId, commentId },
+  ]))
+}
+
+export function moveAnnotationsTool(
+  baseUrl: string,
+  projectId: string,
+  moves: { id: string; x: number; y: number }[],
+): Promise<void> {
+  return postChangeSet(baseUrl, projectId, makeChangeSet([{ kind: 'move_annotations', moves }]))
+}
+
+/** Why a comment couldn't be turned into a braced note; the message is for the agent. */
+export class BraceCommentError extends Error {}
+
+/**
+ * Turn a comment attached to one card into a floating note braced over several
+ * cards, in one change-set: the new note keeps the comment's wording, type and
+ * review pass (and that pass's reviewer), and the original comment is resolved.
+ * A comment with replies is refused — the note can't carry its thread, and the
+ * user's side of the conversation must not be dropped.
+ */
+export async function braceCommentTool(
+  baseUrl: string,
+  projectId: string,
+  args: { cardId: string; commentId: string; cardIds: string[] },
+): Promise<void> {
+  const [card] = await readCards(baseUrl, projectId, [args.cardId])
+  const comment = card?.comments.find((c) => c.id === args.commentId)
+  if (!card || !comment) throw new BraceCommentError(`No comment ${args.commentId} on card ${args.cardId}.`)
+  if (comment.resolved) throw new BraceCommentError(`Comment ${args.commentId} is already resolved.`)
+  if (threadMessages(comment).length > 1) {
+    throw new BraceCommentError(
+      `Comment ${args.commentId} has replies; a braced note can't carry the thread, so leave it attached.`,
+    )
+  }
+  const review = comment.reviewId
+    ? (await listReviews(baseUrl, projectId)).find((r) => r.id === comment.reviewId)
+    : undefined
+  return postChangeSet(baseUrl, projectId, makeChangeSet([
+    {
+      kind: 'create_feedback', text: comment.text, x: card.x, y: card.y,
+      feedback: {
+        type: comment.type, reviewId: comment.reviewId ?? null,
+        reviewer: review?.personality ?? null, cardIds: args.cardIds,
+      },
+    },
+    { kind: 'resolve_comment', cardId: args.cardId, commentId: args.commentId },
   ]))
 }
 

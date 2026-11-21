@@ -26,6 +26,10 @@ import {
   createQuestionTool,
   createFeedbackTool,
   resolveFeedbackTool,
+  resolveCommentTool,
+  moveAnnotationsTool,
+  braceCommentTool,
+  BraceCommentError,
   groupCardsTool,
   ungroupCardsTool,
   listProjectsTool,
@@ -450,6 +454,46 @@ export function createMcpServer(baseUrl: string): McpServer {
     async ({ project, feedbackId }) => {
       await resolveFeedbackTool(baseUrl, project, feedbackId)
       return { content: [{ type: 'text', text: 'feedback resolved' }] }
+    },
+  )
+
+  server.tool(
+    'resolve_comment',
+    "Resolve a comment attached to a card (one from add_comment) only when the user explicitly asks you to dismiss it, or as part of replacing it. Get the cardId and commentId from read_cards. Resolution hides it on the canvas but keeps it in the card's history.",
+    { project: PROJECT, cardId: z.string(), commentId: z.string() },
+    async ({ project, cardId, commentId }) => {
+      await resolveCommentTool(baseUrl, project, cardId, commentId)
+      return { content: [{ type: 'text', text: 'comment resolved' }] }
+    },
+  )
+
+  server.tool(
+    'move_annotations',
+    "Reposition question cards and floating feedback notes (move_cards only moves cards). Ids come from read_map's questions and feedback. A braced note (one with cardIds) is drawn at its brace's tip whatever its x/y, so moving it has no visible effect. Provide absolute x/y for each.",
+    {
+      project: PROJECT,
+      moves: z.array(z.object({ id: z.string(), x: z.number(), y: z.number() })).min(1),
+    },
+    async ({ project, moves }) => {
+      await moveAnnotationsTool(baseUrl, project, moves)
+      return { content: [{ type: 'text', text: 'annotations moved' }] }
+    },
+  )
+
+  server.tool(
+    'brace_comment',
+    "Turn a comment attached to ONE card into a floating note braced over the 2+ cards it is really about (e.g. a comment on beat 3 that discusses beats 1 and 3). The new note keeps the comment's wording, type, review pass and reviewer, and the original comment is resolved, all in one step. Refused if the comment has replies. Get ids from read_map and read_cards.",
+    { project: PROJECT, cardId: z.string(), commentId: z.string(), cardIds: z.array(z.string()).min(2) },
+    async ({ project, cardId, commentId, cardIds }) => {
+      try {
+        await braceCommentTool(baseUrl, project, { cardId, commentId, cardIds })
+      } catch (error) {
+        if (error instanceof BraceCommentError) {
+          return { content: [{ type: 'text', text: error.message }], isError: true }
+        }
+        throw error
+      }
+      return { content: [{ type: 'text', text: 'comment braced' }] }
     },
   )
 
