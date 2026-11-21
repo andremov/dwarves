@@ -6,18 +6,17 @@ import {
 } from 'tldraw'
 import { useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import type { CardKind, NoteKind, Origin, Comment, Reference, FigureStatus, Attribution } from '../model/types'
+import { LEGACY_CARD_DEFAULT_W } from '../model/types'
 import { CARD_DEFAULT_W, makeProseCardProps, canConvertNoteToProse, noteToProseProps, canConvertProseToNote, proseToNoteProps } from '../model/cards'
 import { reattribute, USER_AUTHOR } from '../model/attribution'
 import { AuthorMarks } from './AuthorMarks'
 import { BlameText, hasAgentRun } from './BlameText'
 import { nextFigureStatus } from '../model/figures'
-import { cardGist } from '../model/summary'
 import { estimateCommentHeight, visibleComments } from '../model/comments'
-import { cardAnnotationPins } from '../model/annotationPins'
+import { cardAnnotationPins, pinRowHeight } from '../model/annotationPins'
 import { AnnotationPin } from '../components/AnnotationThread'
 import { assetUrl } from '../client/assets'
-import { fittedGistFontSize, measuredCardPropsHeight } from './autosize'
-import { shouldShowGist, gistFontSize } from './summaryView'
+import { measuredCardPropsHeight } from './autosize'
 import { isExpanded, toggleExpanded } from './mergeView'
 import { cardPageInfo, expandedCardFanInfo } from './cardPageIndex'
 import { ReferenceCardFace } from './ReferenceCardFace'
@@ -200,7 +199,23 @@ const cardVersions = createShapePropsMigrationIds('card', {
   AddCommentHeight: 12,
   AddCommentMessages: 13,
   RemoveCommentFootprint: 14,
+  WidenDefaultCard: 15,
 })
+
+// Text cards widened by half. Only a card still at the old default moves up —
+// one the user sized by hand keeps its width. Height re-measures on mount.
+function isTextCard(props: Record<string, unknown>): boolean {
+  return (props.kind === 'note' || props.kind === 'prose') &&
+    props.noteKind !== 'image' && props.noteKind !== 'reference'
+}
+
+export function widenDefaultCardUp(props: Record<string, unknown>): void {
+  if (isTextCard(props) && props.w === LEGACY_CARD_DEFAULT_W) props.w = CARD_DEFAULT_W
+}
+
+export function widenDefaultCardDown(props: Record<string, unknown>): void {
+  if (isTextCard(props) && props.w === CARD_DEFAULT_W) props.w = LEGACY_CARD_DEFAULT_W
+}
 
 export const cardMigrations = createShapePropsMigrationSequence({
   sequence: [
@@ -320,6 +335,11 @@ export const cardMigrations = createShapePropsMigrationSequence({
       id: cardVersions.RemoveCommentFootprint,
       up: (props) => removeCommentFootprintUp(props as Record<string, unknown>),
       down: (props) => restoreCommentFootprintDown(props as Record<string, unknown>),
+    },
+    {
+      id: cardVersions.WidenDefaultCard,
+      up: (props) => widenDefaultCardUp(props as Record<string, unknown>),
+      down: (props) => widenDefaultCardDown(props as Record<string, unknown>),
     },
   ],
 })
@@ -492,20 +512,21 @@ export class CardShapeUtil extends ShapeUtil<CardShape> {
     // notes (annotation / structured data) and prose cards never show it.
     const showConvertToProse = selected && canConvertNoteToProse(shape.props)
     const showConvertToNote = selected && canConvertProseToNote(shape.props)
-    // Zoomed far out, a summarized card shows its gist so the piece reads at a
-    // glance. getZoomLevel is reactive, so this re-renders as the user zooms;
-    // the gist font counter-scales with zoom to stay a readable on-screen size.
+    // A card shows its full text at every zoom — it never swaps to a truncated
+    // gist. getZoomLevel is reactive; the pins read it to hold their on-screen size.
     const zoom = this.editor.getZoomLevel()
-    const showGist = !isEditing && shouldShowGist(zoom, shape.props)
     const comments = visibleComments(shape.props.comments)
     const pins = cardAnnotationPins(comments)
+    // The pin row hangs below the card, so a card with comments reserves that
+    // row's height and the cards stacked under it are pushed down to clear it.
+    const pinRowH = pinRowHeight(pins.length)
     useLayoutEffect(() => {
       let cancelled = false
       const reserveMarkerRow = () => {
         if (cancelled) return
         const current = this.editor.getShape<CardShape>(shape.id)
         if (!current) return
-        const nextCommentH = 0
+        const nextCommentH = pinRowH
         if (Math.abs(nextCommentH - (current.props.commentH ?? 0)) <= 1) return
 
         const previousHeight = current.props.h + (current.props.commentH ?? 0)
@@ -523,7 +544,7 @@ export class CardShapeUtil extends ShapeUtil<CardShape> {
         cancelled = true
         cancelAnimationFrame(frame)
       }
-    }, [this.editor, shape.id])
+    }, [this.editor, shape.id, pinRowH])
     // Ephemeral agent presence: a soft orange glow when the agent is looking at
     // (read_cards) or has just acted on this card. Reading the atom here is
     // reactive (this component is tldraw-`track`ed, same as the zoom read above),
@@ -570,8 +591,8 @@ export class CardShapeUtil extends ShapeUtil<CardShape> {
           <div className="elves-presence" aria-hidden="true" data-testid="presence-glow" />
           {/* A short paper stack peeking out behind the representative signals
               "there's more collapsed here". Fixed 1–2 edges, quiet until the
-              badge is engaged; hidden while fanned out or zoomed to gist. */}
-          {mergedCount > 0 && !expanded && !showGist && (
+              badge is engaged; hidden while fanned out. */}
+          {mergedCount > 0 && !expanded && (
             <div className="elves-merge-stack" aria-hidden="true" data-testid="merge-stack">
               {Array.from({ length: Math.min(mergedCount, 2) }).map((_, i) => (
                 <div
@@ -583,11 +604,11 @@ export class CardShapeUtil extends ShapeUtil<CardShape> {
             </div>
           )}
           <div
-            className={`elves-card elves-card--${kind}${isImage ? ' elves-card--image' : ''}${isReference ? ' elves-card--reference' : ''}${showGist ? ' elves-card--gist' : ''}${draftExcluded ? ' elves-card--excluded' : ''}`}
+            className={`elves-card elves-card--${kind}${isImage ? ' elves-card--image' : ''}${isReference ? ' elves-card--reference' : ''}${draftExcluded ? ' elves-card--excluded' : ''}`}
             // The card box always fills its shape geometry and clips (overflow:hidden
-            // from .elves-card) — in gist mode too. The gist font is fitted to this
-            // box (fittedGistFontSize below), so the summary shows in full; clipping
-            // is just a hard backstop so nothing can ever overlap the card beneath it.
+            // from .elves-card). Autosize grows the box to fit the full text, so
+            // clipping is just a hard backstop so nothing can ever overlap the card
+            // beneath it.
             style={{ width: '100%', height: '100%' }}
           >
             {isImage ? (
@@ -727,9 +748,8 @@ export class CardShapeUtil extends ShapeUtil<CardShape> {
                     convert toggle sit together, opposite the "Note"/"Prose" label.
                     Author marks stack every contributor to a NOTE's text (prose is
                     human by definition, so it carries no mark); the convert toggle
-                    appears only while the card is solely selected. Hidden in gist
-                    mode with the rest of the chrome. */}
-                {!showGist && (kind === 'note' || kind === 'prose') && (
+                    appears only while the card is solely selected. */}
+                {(kind === 'note' || kind === 'prose') && (
                   <div className="elves-card__corner">
                     {/* Merged chip sits left of the author mark(s) — same flex row,
                         so gap keeps them apart instead of stacking in the corner. */}
@@ -784,10 +804,8 @@ export class CardShapeUtil extends ShapeUtil<CardShape> {
                     )}
                   </div>
                 )}
-                {/* Zoomed out, hide the label/merged chrome so the gist owns the
-                    whole card and reads at a glance. Both note and prose cards
-                    carry a small-caps label. */}
-                {!showGist && (kind === 'note' || kind === 'prose') && (
+                {/* Both note and prose cards carry a small-caps label. */}
+                {(kind === 'note' || kind === 'prose') && (
                   <div className="elves-badge-row">
                     <span className="elves-badge" data-testid="card-badge">{kind === 'prose' ? 'Prose' : 'Note'}</span>
                   </div>
@@ -811,22 +829,6 @@ export class CardShapeUtil extends ShapeUtil<CardShape> {
                       })
                     }}
                   />
-                ) : showGist ? (
-                  <div
-                    className="elves-card__text elves-card__text--gist"
-                    data-testid="card-gist"
-                    style={{
-                      fontSize: fittedGistFontSize(
-                        this.editor,
-                        cardGist(shape.props),
-                        shape.props.w,
-                        shape.props.h,
-                        gistFontSize(zoom),
-                      ),
-                    }}
-                  >
-                    {cardGist(shape.props)}
-                  </div>
                 ) : (
                   <div
                     className={`elves-card__text${blameActive ? ' elves-blame-active' : ''}`}
@@ -838,13 +840,13 @@ export class CardShapeUtil extends ShapeUtil<CardShape> {
               </>
             )}
           </div>
-          {pins.map(({ commentId, offsetY }) => {
+          {pins.map(({ commentId, offsetX }) => {
             const comment = comments.find((entry) => entry.id === commentId)
             return comment ? (
               <AnnotationPin
                 key={comment.id}
                 comment={comment}
-                offsetY={offsetY}
+                offsetX={offsetX}
                 zoom={zoom}
                 target={{ kind: 'card', cardId: shape.id, commentId: comment.id }}
               />

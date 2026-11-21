@@ -15,7 +15,8 @@ export type AnnotationPin = {
 
 export type CardAnnotationPin = {
   commentId: string
-  offsetY: number
+  /** Distance from the card's left edge, in a single row under the card. */
+  offsetX: number
 }
 
 const PIN_TOKENS: Record<CommentType | 'freeform', AnnotationPin> = {
@@ -38,12 +39,17 @@ export function annotationPin(type: CommentType | null): AnnotationPin {
   return { ...token }
 }
 
-/** Place one compact pin per comment in source order, with a fixed clear gap. */
+/** Place one compact pin per comment in source order, in a row under the card. */
 export function cardAnnotationPins(
   comments: readonly { id: string }[],
 ): CardAnnotationPin[] {
   return comments.map((comment, index) => ({
     commentId: comment.id,
-    offsetY: index * (PIN_SIZE + PIN_GAP),
+    offsetX: index * (PIN_SIZE + PIN_GAP),
   }))
+}
+
+/** Height a card reserves below itself for its pin row: a gap, the pins, a gap. */
+export function pinRowHeight(pinCount: number): number {
+  return pinCount > 0 ? PIN_GAP + PIN_SIZE + PIN_GAP : 0
 }

@@ -6,7 +6,7 @@ import {
   makeReferenceCardProps,
 } from '../../src/model/cards'
 import {
-  measuredCardHeight, measuredCardPropsHeight, measuredReferenceHeight, measuredSectionSize,
+  measuredCardHeight, measuredCardPropsHeight, measuredReferenceHeight, measuredSectionSize, SECTION_PAD_X,
   fittedGistFontSize, measuredQuestionHeight, fittedQuestionGistFontSize, measuredFigureHeight,
   PROSE_TEXT_MIN,
 } from '../../src/shapes/autosize'
@@ -248,28 +248,20 @@ describe('fittedQuestionGistFontSize', () => {
 })
 
 describe('measuredSectionSize', () => {
-  it('keeps the current width when not fitting, only setting height', () => {
+  it('fits a label to its single line plus side padding and a little slack', () => {
     const { editor } = fakeEditor()
-    const { w, h } = measuredSectionSize(editor, 'Short', 600, false)
-    expect(w).toBe(600)
+    // 'Refs' => single-line width 40 => w = 40 + 2 × SECTION_PAD_X + 8
+    const { w, h } = measuredSectionSize(editor, 'Refs')
+    expect(w).toBe(40 + 2 * SECTION_PAD_X + 8)
     expect(h).toBeGreaterThan(0)
   })
 
-  it('fits a short label to a single line plus a little slack', () => {
+  it('never wraps a long label: it stays one line, however wide', () => {
     const { editor } = fakeEditor()
-    // 'Refs' => single-line width 40 (<= 520) => w = 40 + 8
-    const { w } = measuredSectionSize(editor, 'Refs', 320, true)
-    expect(w).toBe(48)
-  })
-
-  it('wraps a long label toward two lines instead of one very wide line', () => {
-    const { editor } = fakeEditor()
-    const label = 'Evidence: extensible software that works' // 40 chars => single-line 400...
-    // make it exceed the 520 one-line threshold:
-    const long = 'x'.repeat(60) // single-line width 600 > 520
-    const { w } = measuredSectionSize(editor, long, 320, true)
-    expect(w).toBe(Math.ceil(600 / 2) + 40) // ~two lines
-    expect(w).toBeLessThan(600) // narrower than the one-line width
-    void label
+    const long = 'x'.repeat(60) // single-line width 600
+    const short = measuredSectionSize(editor, 'x')
+    const { w, h } = measuredSectionSize(editor, long)
+    expect(w).toBe(600 + 2 * SECTION_PAD_X + 8)
+    expect(h).toBe(short.h) // same height as a one-character label: one line
   })
 })

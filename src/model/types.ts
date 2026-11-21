@@ -210,8 +210,10 @@ export interface CardProps {
   summaryAt: string | null
 }
 
-export const CARD_DEFAULT_W = 370
+export const CARD_DEFAULT_W = 555
 export const CARD_DEFAULT_H = 120
+/** The default before cards widened by half; cards still at it migrate up. */
+export const LEGACY_CARD_DEFAULT_W = 370
 
 // Cards an agent adds through the MCP (any card whose `authoredBy` is stamped,
 // i.e. every agent-written note and figure) are born at a comfortable measure.
@@ -219,7 +221,7 @@ export const CARD_DEFAULT_H = 120
 // reads better at a settled width without the user having to size it by hand
 // every time. Height still follows the text (measured client-side), so this only
 // sets how wide an agent's cards arrive.
-export const AGENT_CARD_DEFAULT_W = 370
+export const AGENT_CARD_DEFAULT_W = 555
 
 // Reference cards are a touch wider than notes to hold a title + a metadata row
 // comfortably; height is measured to fit the type-adaptive face.

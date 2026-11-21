@@ -6,12 +6,14 @@
    ========================================================================= */
 .elves-section {
   box-sizing: border-box;
+  /* Keep in step with SECTION_PAD_X and the 32px font in autosize.ts. The side
+     padding holds the label clear of its band's left rule. */
+  padding: 0 24px;
   font-family: var(--elves-card-font);
   font-weight: 700;
-  font-size: 56px;
+  font-size: 32px;
   line-height: 1.15;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
+  white-space: pre;
   color: var(--elves-ink);
 }
 .elves-section[data-authored-by="claude"] { color: var(--elves-claude-accent); }

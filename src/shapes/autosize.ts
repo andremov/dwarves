@@ -290,38 +290,25 @@ export function measuredCardPropsHeight(
 }
 
 // --- Section headers -----------------------------------------------------
-// section.css: font 56px bold / line-height 1.15; no padding. A long label
-// should wrap to about two lines, never three.
-const SECTION_ONE_LINE_MAX = 520 // above this single-line width, wrap to two lines
+// section.css: font 32px bold / line-height 1.15, never wraps, padded
+// SECTION_PAD_X on each side so the label sits clear of its band's left rule.
+// The header is always exactly as wide as its one line of text.
+export const SECTION_PAD_X = 24
 
-export function measuredSectionSize(
-  editor: Editor,
-  text: string,
-  currentWidth: number,
-  fitWidth: boolean,
-): { w: number; h: number } {
+export function measuredSectionSize(editor: Editor, text: string): { w: number; h: number } {
   // A blank header is sized to its placeholder prompt, so "Section name" shows
   // in full while typing the first character rather than clipping to a sliver.
   const measured = text || SECTION_PLACEHOLDER
-  const base = {
+  const { w, h } = editor.textMeasure.measureText(measured, {
     fontFamily: FONT_FAMILY,
-    fontSize: 56,
+    fontSize: 32,
     lineHeight: 1.15,
     fontWeight: '700',
     fontStyle: 'normal',
     padding: '0px',
-  } as const
-
-  let width = currentWidth
-  if (fitWidth) {
-    const single = editor.textMeasure.measureText(measured, { ...base, maxWidth: null })
-    width =
-      single.w > SECTION_ONE_LINE_MAX
-        ? Math.ceil(single.w / 2) + 40 // aim for ~two lines
-        : Math.ceil(single.w) + 8
-  }
-  const { h } = editor.textMeasure.measureText(measured, { ...base, maxWidth: width })
-  return { w: Math.ceil(width), h: Math.ceil(h) + 8 }
+    maxWidth: null,
+  })
+  return { w: Math.ceil(w) + 2 * SECTION_PAD_X + 8, h: Math.ceil(h) + 8 }
 }
 
 // --- Question cards ------------------------------------------------------

@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { annotationPin, cardAnnotationPins } from '../../src/model/annotationPins'
+import { annotationPin, cardAnnotationPins, pinRowHeight } from '../../src/model/annotationPins'
 
 test('every comment type has a readable stable pin token', () => {
   expect(annotationPin(null)).toEqual({ icon: 'comment', tone: 'freeform', label: 'Comment' })
@@ -15,17 +15,23 @@ test('every comment type has a readable stable pin token', () => {
   expect(annotationPin('tighten')).toEqual({ icon: 'scissors', tone: 'tighten', label: 'Tighten' })
 })
 
-test('card pins are one-per-comment and vertically non-overlapping', () => {
+test('card pins are one-per-comment in a non-overlapping row', () => {
   expect(cardAnnotationPins([{ id: 'a' }, { id: 'b' }] as any)).toEqual([
-    { commentId: 'a', offsetY: 0 }, { commentId: 'b', offsetY: 36 },
+    { commentId: 'a', offsetX: 0 }, { commentId: 'b', offsetX: 36 },
   ])
 })
 
 test('card pin placement is deterministic and handles an empty card', () => {
   expect(cardAnnotationPins([])).toEqual([])
   expect(cardAnnotationPins([{ id: 'b' }, { id: 'a' }, { id: 'b' }])).toEqual([
-    { commentId: 'b', offsetY: 0 },
-    { commentId: 'a', offsetY: 36 },
-    { commentId: 'b', offsetY: 72 },
+    { commentId: 'b', offsetX: 0 },
+    { commentId: 'a', offsetX: 36 },
+    { commentId: 'b', offsetX: 72 },
   ])
+})
+
+test('a card reserves a pin row below itself only when it has pins', () => {
+  expect(pinRowHeight(0)).toBe(0)
+  expect(pinRowHeight(1)).toBe(8 + 28 + 8)
+  expect(pinRowHeight(3)).toBe(pinRowHeight(1)) // one row, however many pins
 })

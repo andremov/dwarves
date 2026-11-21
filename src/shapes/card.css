@@ -15,7 +15,8 @@
   gap: 6px;
   background: var(--elves-surface);
   border: 1px solid var(--elves-border);
-  box-shadow: var(--elves-shadow-sm), var(--elves-highlight);
+  /* Lifted off the canvas (and its section bands) rather than sitting flat. */
+  box-shadow: var(--elves-shadow-md), var(--elves-highlight);
 }
 .elves-card--prose {
   color: var(--elves-ink);

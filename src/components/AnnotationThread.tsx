@@ -4,7 +4,7 @@ import {
   Hourglass, PaperPlaneRight, Question, Scissors, Stack, UserCircle, Warning, X,
 } from '@phosphor-icons/react'
 import { authorInfo } from '../shapes/agents'
-import { annotationPin, PIN_SIZE, type AnnotationPinIcon } from '../model/annotationPins'
+import { annotationPin, PIN_GAP, PIN_SIZE, type AnnotationPinIcon } from '../model/annotationPins'
 import { threadMessages } from '../model/comments'
 import { commentGist } from '../model/summary'
 import type { Comment } from '../model/types'
@@ -342,21 +342,25 @@ const PIN_ICONS: Record<AnnotationPinIcon, typeof Question> = {
 
 export interface AnnotationPinProps {
   comment: AnnotationThreadComment
-  offsetY?: number
+  /** A card pin's place in the row under its card; omitted for floating feedback. */
+  offsetX?: number
   zoom?: number
   className?: string
   target?: AnnotationTarget
 }
 
 /** A compact target that opens its shared foreground thread on demand. */
-export function AnnotationPin({ comment, offsetY = 0, zoom = 1, className, target }: AnnotationPinProps) {
+export function AnnotationPin({ comment, offsetX = 0, zoom = 1, className, target }: AnnotationPinProps) {
   const token = annotationPin(comment.type)
   const Icon = PIN_ICONS[token.icon]
   const scale = 1 / zoom
+  // Floating feedback IS its pin, so it sits at its own origin; a card's pins
+  // hang in a row just below the card's bottom edge.
+  const isFeedback = className?.includes('elves-feedback-pin')
   const style = {
-    top: offsetY * scale,
-    right: className?.includes('elves-feedback-pin') ? undefined : -36 * scale,
-    left: className?.includes('elves-feedback-pin') ? 0 : undefined,
+    top: isFeedback ? 0 : `calc(100% + ${PIN_GAP}px)`,
+    left: isFeedback ? 0 : offsetX * scale,
+    transformOrigin: isFeedback ? undefined : 'top left',
     '--annotation-pin-scale': scale,
   } as CSSProperties
   const stopPointer = (event: PropagationEvent) => stopEvent(event)

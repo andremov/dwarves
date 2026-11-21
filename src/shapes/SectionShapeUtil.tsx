@@ -1,11 +1,10 @@
 import {
   ShapeUtil, TLBaseShape, HTMLContainer, Rectangle2d, T, RecordProps,
-  resizeBox,
-  type Editor, type Geometry2d, type TLResizeInfo, type TLShapePartial,
+  type Editor, type Geometry2d, type TLShapePartial,
 } from 'tldraw'
 import { useLayoutEffect, type ReactNode } from 'react'
 import type { SectionAuthor } from '../model/sections'
-import { makeSectionProps, SECTION_DEFAULT_W, SECTION_PLACEHOLDER } from '../model/sections'
+import { makeSectionProps, SECTION_PLACEHOLDER } from '../model/sections'
 import { measuredSectionSize } from './autosize'
 import './section.css'
 
@@ -17,10 +16,9 @@ export type SectionShape = TLBaseShape<'section', {
 }>
 
 /**
- * Sizes a section header to its label: a header still at the default width is
- * fitted to about two lines (never the three-line overflow that clipped the big
- * 56px labels), and height always follows the text. A header the user has
- * widened keeps its width — only its height is kept in sync.
+ * Sizes a section header to its label: always one line, exactly as wide as the
+ * text plus its side padding. Width isn't user-controlled — a header never
+ * wraps, so any other width would only clip it or leave dead space.
  */
 function AutosizeSection({
   editor, shape, children,
@@ -32,8 +30,7 @@ function AutosizeSection({
       if (cancelled) return
       const cur = editor.getShape<SectionShape>(shape.id)
       if (!cur) return
-      const fitWidth = Math.abs(cur.props.w - SECTION_DEFAULT_W) < 1
-      const size = measuredSectionSize(editor, cur.props.text, cur.props.w, fitWidth)
+      const size = measuredSectionSize(editor, cur.props.text)
       const props: Partial<SectionShape['props']> = {}
       if (Math.abs(size.w - cur.props.w) > 1) props.w = size.w
       if (Math.abs(size.h - cur.props.h) > 1) props.h = size.h
@@ -105,7 +102,7 @@ export class SectionShapeUtil extends ShapeUtil<SectionShape> {
     return <rect width={shape.props.w} height={shape.props.h} />
   }
 
-  override canResize() { return true }
+  override canResize() { return false }
   override canEdit() { return true }
   // A section that never got a title is noise, not structure — so when editing
   // ends on a blank label, drop the shape (mirrors tldraw's own TextShapeUtil,
@@ -121,12 +118,5 @@ export class SectionShapeUtil extends ShapeUtil<SectionShape> {
   override hideRotateHandle() { return true }
   override onRotate(initial: SectionShape): TLShapePartial<SectionShape> {
     return { id: initial.id, type: 'section', x: initial.x, y: initial.y, rotation: initial.rotation }
-  }
-  override onResize(shape: SectionShape, info: TLResizeInfo<SectionShape>) {
-    // User drags the width; height re-fits the label at that width.
-    const next = resizeBox(shape, info)
-    const w = next.props?.w ?? shape.props.w
-    const h = measuredSectionSize(this.editor, shape.props.text, w, false).h
-    return { ...next, props: { ...next.props, h } }
   }
 }
