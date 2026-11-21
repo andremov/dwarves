@@ -513,8 +513,7 @@ export class CardShapeUtil extends ShapeUtil<CardShape> {
     const showConvertToProse = selected && canConvertNoteToProse(shape.props)
     const showConvertToNote = selected && canConvertProseToNote(shape.props)
     // A card shows its full text at every zoom — it never swaps to a truncated
-    // gist. getZoomLevel is reactive; the pins read it to hold their on-screen size.
-    const zoom = this.editor.getZoomLevel()
+    // gist — and its pins are a fixed page-space size that zooms with it.
     const comments = visibleComments(shape.props.comments)
     const pins = cardAnnotationPins(comments)
     // The pin row hangs below the card, so a card with comments reserves that
@@ -547,7 +546,7 @@ export class CardShapeUtil extends ShapeUtil<CardShape> {
     }, [this.editor, shape.id, pinRowH])
     // Ephemeral agent presence: a soft orange glow when the agent is looking at
     // (read_cards) or has just acted on this card. Reading the atom here is
-    // reactive (this component is tldraw-`track`ed, same as the zoom read above),
+    // reactive (this component is tldraw-`track`ed),
     // so the glow appears and fades on its own. Lives entirely outside the
     // document — never persisted, never in undo history.
     const presence = presenceMode(shape.id)
@@ -847,7 +846,6 @@ export class CardShapeUtil extends ShapeUtil<CardShape> {
                 key={comment.id}
                 comment={comment}
                 offsetX={offsetX}
-                zoom={zoom}
                 target={{ kind: 'card', cardId: shape.id, commentId: comment.id }}
               />
             ) : null

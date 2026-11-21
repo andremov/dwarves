@@ -344,24 +344,23 @@ export interface AnnotationPinProps {
   comment: AnnotationThreadComment
   /** A card pin's place in the row under its card; omitted for floating feedback. */
   offsetX?: number
-  zoom?: number
   className?: string
   target?: AnnotationTarget
 }
 
-/** A compact target that opens its shared foreground thread on demand. */
-export function AnnotationPin({ comment, offsetX = 0, zoom = 1, className, target }: AnnotationPinProps) {
+/**
+ * A compact target that opens its shared foreground thread on demand. Pins
+ * are a fixed size in page space, so they zoom with the cards they mark.
+ */
+export function AnnotationPin({ comment, offsetX = 0, className, target }: AnnotationPinProps) {
   const token = annotationPin(comment.type)
   const Icon = PIN_ICONS[token.icon]
-  const scale = 1 / zoom
   // Floating feedback IS its pin, so it sits at its own origin; a card's pins
   // hang in a row just below the card's bottom edge.
   const isFeedback = className?.includes('elves-feedback-pin')
   const style = {
     top: isFeedback ? 0 : `calc(100% + ${PIN_GAP}px)`,
-    left: isFeedback ? 0 : offsetX * scale,
-    transformOrigin: isFeedback ? undefined : 'top left',
-    '--annotation-pin-scale': scale,
+    left: isFeedback ? 0 : offsetX,
   } as CSSProperties
   const stopPointer = (event: PropagationEvent) => stopEvent(event)
   const open = (event: MouseEvent) => {

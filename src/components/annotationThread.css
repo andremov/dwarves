@@ -77,8 +77,6 @@
   width: 28px;
   height: 28px;
   pointer-events: all;
-  transform: scale(var(--annotation-pin-scale, 1));
-  transform-origin: top right;
 }
 .elves-annotation-pin {
   box-sizing: border-box;

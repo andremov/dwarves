@@ -52,7 +52,6 @@ export class FeedbackShapeUtil extends ShapeUtil<FeedbackShape> {
         <AnnotationPin
           className="elves-feedback-pin"
           comment={{ id: shape.id, type: shape.props.type, text: shape.props.text, resolved: false, author: shape.props.authoredBy, messages: shape.props.messages }}
-          zoom={this.editor.getZoomLevel()}
           target={{ kind: 'feedback', feedbackId: shape.id }}
         />
       </HTMLContainer>
