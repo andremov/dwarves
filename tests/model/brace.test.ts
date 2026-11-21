@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { BRACE_DEPTH, BRACE_GAP, BRACE_PIN_GAP, braceLayout, bracePath } from '../../src/model/brace'
+import { BRACE_DEPTH, BRACE_GAP, BRACE_LANE, BRACE_PIN_GAP, braceLayout, bracePath, stackBraces } from '../../src/model/brace'
 import { PIN_SIZE } from '../../src/model/annotationPins'
 import { isChangeSet, referencedCardIds } from '../../src/model/changeset'
 import { makeFeedbackProps } from '../../src/model/feedback'
@@ -56,4 +56,19 @@ test("a braced note's cards must exist: they count as referenced cards", () => {
 test('feedback props carry cardIds only when given', () => {
   expect(makeFeedbackProps('n', 'claude', { cardIds: ['shape:a', 'shape:b'] }).cardIds).toEqual(['shape:a', 'shape:b'])
   expect('cardIds' in makeFeedbackProps('n', 'claude', {})).toBe(false)
+})
+
+test('braces over the same cards stack into separate rows instead of overlapping', () => {
+  const row = [card(0, 0), card(603, 0), card(1206, 0)]
+  const [first, second] = stackBraces([braceLayout(row)!, braceLayout(row)!])
+  expect(first).toEqual(braceLayout(row))
+  expect(second.brace.y).toBe(first.brace.y + BRACE_LANE)
+  expect(second.pin.y).toBe(first.pin.y + BRACE_LANE)
+  expect(second.brace.x).toBe(first.brace.x)
+})
+
+test('braces that do not overlap stay where they are', () => {
+  const left = braceLayout([card(0, 0), card(603, 0)])!
+  const right = braceLayout([card(3000, 0), card(3603, 0)])!
+  expect(stackBraces([left, right])).toEqual([left, right])
 })

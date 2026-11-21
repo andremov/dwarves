@@ -85,3 +85,53 @@ export function bracePath(orientation: BraceOrientation, length: number): string
     `Q ${at(length, d / 2)} ${at(length, 0)}`,
   ].join(' ')
 }
+
+/** How far each further brace sits from the one before it when braces overlap. */
+export const BRACE_LANE = BRACE_GAP + BRACE_DEPTH + BRACE_PIN_GAP + PIN_SIZE
+
+/** The space a brace and its pin take up together. */
+function footprint(layout: BraceLayout): Box {
+  const extra = BRACE_PIN_GAP + PIN_SIZE
+  return layout.orientation === 'under'
+    ? { x: layout.brace.x, y: layout.brace.y, w: layout.brace.w, h: layout.brace.h + extra }
+    : { x: layout.brace.x, y: layout.brace.y, w: layout.brace.w + extra, h: layout.brace.h }
+}
+
+function overlaps(a: Box, b: Box): boolean {
+  return a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h
+}
+
+/**
+ * Push a brace (and its pin) `lane` rows further out, away from its cards: down
+ * for an 'under' brace, right for a 'beside' one. Lane 0 is the brace as laid out.
+ */
+export function stackBrace(layout: BraceLayout, lane: number): BraceLayout {
+  if (lane <= 0) return layout
+  const d = lane * BRACE_LANE
+  const [dx, dy] = layout.orientation === 'under' ? [0, d] : [d, 0]
+  return {
+    orientation: layout.orientation,
+    brace: { ...layout.brace, x: layout.brace.x + dx, y: layout.brace.y + dy },
+    pin: { x: layout.pin.x + dx, y: layout.pin.y + dy },
+  }
+}
+
+/**
+ * Lay out several braces so none draws over another. Braces are placed in the
+ * order given; each takes the first lane where its brace and pin clear every
+ * brace already placed. Same order in, same layout out, so every note's shape
+ * computes the same answer independently.
+ */
+export function stackBraces(layouts: readonly BraceLayout[]): BraceLayout[] {
+  const placed: BraceLayout[] = []
+  for (const layout of layouts) {
+    let lane = 0
+    let candidate = layout
+    while (placed.some((other) => overlaps(footprint(candidate), footprint(other)))) {
+      lane += 1
+      candidate = stackBrace(layout, lane)
+    }
+    placed.push(candidate)
+  }
+  return placed
+}

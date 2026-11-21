@@ -4,7 +4,7 @@ import {
   type Editor, type Geometry2d,
 } from 'tldraw'
 import { FEEDBACK_DEFAULT_H, FEEDBACK_DEFAULT_W, makeFeedbackProps } from '../model/feedback'
-import { braceLayout, bracePath, type BraceLayout, type Box } from '../model/brace'
+import { braceLayout, bracePath, stackBraces, type BraceLayout, type Box } from '../model/brace'
 import { annotationPin } from '../model/annotationPins'
 import type { CommentType } from '../model/types'
 import type { CardShape } from './CardShapeUtil'
@@ -46,7 +46,7 @@ export const feedbackMigrations = createShapePropsMigrationSequence({
  * fewer than two left there is no brace and the note is a plain floating pin.
  * Reading shapes and bounds here is reactive, so the brace tracks the cards.
  */
-function braceLayoutFor(editor: Editor, shape: FeedbackShape): BraceLayout | null {
+function ownBraceLayout(editor: Editor, shape: FeedbackShape): BraceLayout | null {
   const ids = shape.props.cardIds
   if (!ids || ids.length < 2) return null
   const boxes: Box[] = []
@@ -58,6 +58,26 @@ function braceLayoutFor(editor: Editor, shape: FeedbackShape): BraceLayout | nul
     boxes.push({ x: bounds.x, y: bounds.y, w: bounds.w, h: bounds.h + (card.props.commentH ?? 0) })
   }
   return braceLayout(boxes)
+}
+
+/**
+ * A note's brace after making room for the others: every open braced note on
+ * the page is laid out in canvas order and overlapping braces are stacked into
+ * separate rows (see stackBraces), so two notes about the same cards don't
+ * draw over each other.
+ */
+function braceLayoutFor(editor: Editor, shape: FeedbackShape): BraceLayout | null {
+  if (!ownBraceLayout(editor, shape)) return null
+  const notes = editor.getCurrentPageShapes()
+    .filter((s): s is FeedbackShape => s.type === 'feedback' && !(s as FeedbackShape).props.resolved)
+    .sort((a, b) => (a.index < b.index ? -1 : a.index > b.index ? 1 : a.id < b.id ? -1 : 1))
+  const braced: { id: string; layout: BraceLayout }[] = []
+  for (const note of notes) {
+    const layout = ownBraceLayout(editor, note)
+    if (layout) braced.push({ id: note.id, layout })
+  }
+  const stacked = stackBraces(braced.map((b) => b.layout))
+  return stacked[braced.findIndex((b) => b.id === shape.id)] ?? null
 }
 
 /**
