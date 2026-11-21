@@ -94,6 +94,13 @@
   --elves-snap-fill:   oklch(0.880 0.105 152 / 0.32);
   --elves-snap-border: oklch(0.760 0.115 152 / 0.48);
 
+  /* ---- Section bands (src/shapes/SectionBands.tsx) — the column each section
+     owns. Two barely-different ink washes alternate so neighbours separate, and
+     a firmer left rule marks the exact boundary the draft compiles by. ---- */
+  --elves-band-even: oklch(0.215 0.017 42 / 0.025);
+  --elves-band-odd:  oklch(0.215 0.017 42 / 0.055);
+  --elves-band-edge: oklch(0.215 0.017 42 / 0.14);
+
   /* ---- Comment colour ramps — calm, desaturated bands. Each type gets a
      readable label colour, a very light tinted background, and a subtle tinted
      border.

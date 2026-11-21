@@ -1,0 +1,14 @@
+/* The column a section owns. Positioned by inline transform in page space
+   (SectionBands.tsx); everything visual lives here. Alternating washes keep
+   neighbouring bands distinct, and the left rule marks the exact boundary the
+   draft compile uses. */
+.elves-section-band {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-left: 2px solid var(--elves-band-edge);
+  background: var(--elves-band-even);
+  /* Purely a reading aid: never eat a pointer event. */
+  pointer-events: none;
+}
+.elves-section-band[data-parity="odd"] { background: var(--elves-band-odd); }

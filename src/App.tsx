@@ -6,6 +6,7 @@ import './theme.css'
 import { CardShapeUtil, CardShape } from './shapes/CardShapeUtil'
 import { CardSelectionForeground } from './shapes/CardSelectionForeground'
 import { SnapHighlight } from './shapes/SnapHighlight'
+import { SectionBands } from './shapes/SectionBands'
 import { measuredCardPropsHeight } from './shapes/autosize'
 import { cardIsHidden, collapseAll } from './shapes/mergeView'
 import { SectionShapeUtil, SectionShape } from './shapes/SectionShapeUtil'
@@ -75,11 +76,20 @@ import { createPointerDragManager, type PointerDragManager } from './client/divi
 import { browserRecoveryContext } from './client/canvasRecovery'
 
 const shapeUtils = [CardShapeUtil, SectionShapeUtil, QuestionShapeUtil, FeedbackShapeUtil]
-// OnTheCanvas renders in page space behind the shapes, which is where the snap
-// halo belongs — a wash under the two cards being joined, not a box over them.
+// OnTheCanvas renders in page space behind the shapes, which is where the
+// section bands and the snap halo belong — washes under the cards, not boxes
+// over them. Bands go first so a live snap paints above them.
+function CanvasUnderlay() {
+  return (
+    <>
+      <SectionBands />
+      <SnapHighlight />
+    </>
+  )
+}
 const components = {
   SelectionForeground: CardSelectionForeground,
-  OnTheCanvas: SnapHighlight,
+  OnTheCanvas: CanvasUnderlay,
   InFrontOfTheCanvas: AnnotationPopoverLayer,
 }
 const canvasTransport = {
