@@ -70,7 +70,7 @@ test('Escape closes the review menu and returns focus to its trigger', async ({ 
   const reviewButton = page.getByTestId('review-button')
   const reviewMenu = page.getByTestId('review-menu')
   const focusInput = page.getByTestId('review-focus')
-  const menuControl = page.getByTestId('review-summon-trimmer')
+  const menuControl = page.getByTestId('review-summon-pacing')
   const projectSwitcher = page.getByTestId('project-switcher')
 
   await reviewButton.click()
@@ -103,14 +103,14 @@ test('duplicate reviewer passes have contextual clear controls', async ({ page, 
 
   await page.getByTestId('review-button').click()
   await page.getByTestId('review-focus').fill('just the opening')
-  await page.getByTestId('review-summon-devils-advocate').click()
-  const passes = page.getByTestId('review-pass-devils-advocate')
+  await page.getByTestId('review-summon-specificity').click()
+  const passes = page.getByTestId('review-pass-specificity')
   await expect.poll(async () => passes.first().getAttribute('data-status'), {
     timeout: 20000,
   }).toBe('done')
 
   await page.getByTestId('review-focus').fill('just the ending')
-  await page.getByTestId('review-summon-devils-advocate').click()
+  await page.getByTestId('review-summon-specificity').click()
 
   // Both passes show up as done, each with a distinct action in the page-wide
   // control list a screen reader exposes.
@@ -131,7 +131,7 @@ test('duplicate reviewer passes have contextual clear controls', async ({ page, 
   const { reviews } = await (await request.get(`${BASE}/projects/${projectId}/reviews`)).json()
   const done = reviews.filter((r: any) => r.status === 'done')
   expect(done).toHaveLength(2)
-  expect(done.every((r: any) => r.personality === 'devils-advocate')).toBe(true)
+  expect(done.every((r: any) => r.personality === 'specificity')).toBe(true)
   expect(done.map((r: any) => r.focus).sort()).toEqual(['just the ending', 'just the opening'])
 
   await clearOpening.click()
@@ -144,13 +144,13 @@ test('duplicate reviewer passes have contextual clear controls', async ({ page, 
 test('same-personality passes without focus use distinct requested times', async ({ page }) => {
   await openCanvas(page)
   await page.getByTestId('review-button').click()
-  await page.getByTestId('review-summon-trimmer').click()
-  const passes = page.getByTestId('review-pass-trimmer')
+  await page.getByTestId('review-summon-pacing').click()
+  const passes = page.getByTestId('review-pass-pacing')
   await expect.poll(async () => passes.first().getAttribute('data-status'), {
     timeout: 20000,
   }).toBe('done')
   await page.waitForTimeout(5)
-  await page.getByTestId('review-summon-trimmer').click()
+  await page.getByTestId('review-summon-pacing').click()
   await expect(passes).toHaveCount(2)
   await expect.poll(async () => passes.evaluateAll(
     (rows) => rows.map((row) => row.getAttribute('data-status')),
@@ -177,9 +177,9 @@ test('summoning runs a full pass in-app', async ({ page, request }) => {
   await page.keyboard.press('Escape')
 
   await page.getByTestId('review-button').click()
-  await page.getByTestId('review-summon-trimmer').click()
+  await page.getByTestId('review-summon-pacing').click()
 
-  const pass = page.getByTestId('review-pass-trimmer')
+  const pass = page.getByTestId('review-pass-pacing')
   await expect(pass).toBeVisible()
 
   // The stub claims almost immediately, but it's a real child process — give it
@@ -198,7 +198,7 @@ test('summoning runs a full pass in-app', async ({ page, request }) => {
   ).toBe('done')
 
   await expect(page.getByTestId('review-verdict')).toContainText('Stub verdict')
-  await expect(page.getByTestId('review-tally-trimmer')).toContainText('1 open · 1 notes')
+  await expect(page.getByTestId('review-tally-pacing')).toContainText('1 open · 1 notes')
 
   // The tagged comment renders as the shared compact marker, retaining its
   // review type while its conversation opens in the foreground canvas layer.
@@ -226,8 +226,8 @@ test('floating feedback opens in the foreground and resolving leaves a durable r
     text: 'The middle needs a bridge',
     x: 80,
     y: 80,
-    type: 'structure',
-    reviewer: 'architect',
+    type: 'so-what',
+    reviewer: 'landing',
   })
 
   const marker = page.getByTestId('annotation-pin')
@@ -273,8 +273,8 @@ test('foreground threads stay operable at every canvas edge above cards, feedbac
       id: `foreground-surface-comments-${Date.now()}`,
       author: 'claude',
       ops: [
-        { kind: 'add_comment', cardId: proseCardId, comment: { type: 'structure', text: 'Foreground above the prose card.' } },
-        { kind: 'add_comment', cardId: referenceCardId, comment: { type: 'needs-citation', text: 'Foreground above the link preview.' } },
+        { kind: 'add_comment', cardId: proseCardId, comment: { type: 'so-what', text: 'Foreground above the prose card.' } },
+        { kind: 'add_comment', cardId: referenceCardId, comment: { type: 'buried', text: 'Foreground above the link preview.' } },
       ],
     },
   })
@@ -287,7 +287,7 @@ test('foreground threads stay operable at every canvas edge above cards, feedbac
     { text: 'Bottom-right feedback.', x: viewport.width - 64, y: viewport.height - 64, horizontal: 'right' as const, vertical: 'bottom' as const },
   ]
   for (const item of edgeFeedback) {
-    await createFeedbackTool(BASE, projectId, { ...item, type: 'weak-argument', reviewer: 'architect' })
+    await createFeedbackTool(BASE, projectId, { ...item, type: 'told', reviewer: 'landing' })
   }
 
   const prosePin = page.locator(`[data-shape-id="${proseCardId}"] [data-testid="annotation-pin"]`)
@@ -418,9 +418,9 @@ test('a failing run marks the pass failed, with Retry', async ({ page }) => {
   // launchReviewRun completion handler then marks the pass failed itself.
   await page.getByTestId('review-button').click()
   await page.getByTestId('review-focus').fill('__fail__')
-  await page.getByTestId('review-summon-devils-advocate').click()
+  await page.getByTestId('review-summon-specificity').click()
 
-  const pass = page.getByTestId('review-pass-devils-advocate')
+  const pass = page.getByTestId('review-pass-specificity')
   await expect(pass).toBeVisible()
   await expect.poll(
     async () => (await pass.getAttribute('data-status')),
@@ -433,7 +433,7 @@ test('a failing run marks the pass failed, with Retry', async ({ page }) => {
   })
   await expect(clearFailed).toBeVisible()
   await expect(clearFailed).toHaveAttribute('title', 'Clear from panel')
-  const retry = page.getByTestId('review-retry-devils-advocate')
+  const retry = page.getByTestId('review-retry-specificity')
   await expect(retry).toBeVisible()
 
   // Retry re-spawns the stub, which fails again (focus is still __fail__) — the
@@ -453,11 +453,11 @@ test('dismissing a running/failed pass clears it', async ({ page }) => {
   await openCanvas(page)
 
   await page.getByTestId('review-button').click()
-  await page.getByTestId('review-summon-first-reader').click()
+  await page.getByTestId('review-summon-cold-reader').click()
 
-  const pass = page.getByTestId('review-pass-first-reader')
+  const pass = page.getByTestId('review-pass-cold-reader')
   await expect(pass).toBeVisible()
 
-  await page.getByTestId('review-dismiss-first-reader').click()
+  await page.getByTestId('review-dismiss-cold-reader').click()
   await expect(pass).toHaveCount(0)
 })

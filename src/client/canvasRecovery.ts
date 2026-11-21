@@ -180,7 +180,7 @@ export function browserRecoveryContext(project: Project): CanvasRecoveryContext 
   browserOwnership ??= createBrowserRecoveryOwnership(window)
   return {
     store: browserStore,
-    serverOrigin: new URL((import.meta as any).env?.VITE_SERVER_URL ?? 'http://localhost:5199', window.location.href).origin,
+    serverOrigin: new URL((import.meta as any).env?.VITE_SERVER_URL ?? 'http://localhost:5299', window.location.href).origin,
     get sessionId() { return browserOwnership!.sessionId },
     ready: browserOwnership.ready,
     activeSessionIds: browserOwnership.activeSessionIds,

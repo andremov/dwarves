@@ -3,14 +3,15 @@ import { annotationPin, cardAnnotationPins } from '../../src/model/annotationPin
 
 test('every comment type has a readable stable pin token', () => {
   expect(annotationPin(null)).toEqual({ icon: 'comment', tone: 'freeform', label: 'Comment' })
-  expect(annotationPin('needs-evidence')).toEqual({ icon: 'warning', tone: 'needs-evidence', label: 'Needs evidence' })
-  expect(annotationPin('weak-argument')).toEqual({ icon: 'chart-down', tone: 'weak-argument', label: 'Weak argument' })
-  expect(annotationPin('needs-citation')).toEqual({ icon: 'link', tone: 'needs-citation', label: 'Needs citation' })
-  expect(annotationPin('wants-figure')).toEqual({ icon: 'image', tone: 'wants-figure', label: 'Wants figure' })
-  expect(annotationPin('counterpoint')).toEqual({ icon: 'arrows', tone: 'counterpoint', label: 'Counterpoint' })
-  expect(annotationPin('tighten')).toEqual({ icon: 'scissors', tone: 'tighten', label: 'Tighten' })
+  expect(annotationPin('abstract')).toEqual({ icon: 'warning', tone: 'abstract', label: 'Abstract' })
+  expect(annotationPin('told')).toEqual({ icon: 'image', tone: 'told', label: 'Told' })
+  expect(annotationPin('unearned')).toEqual({ icon: 'chart-down', tone: 'unearned', label: 'Unearned' })
+  expect(annotationPin('false-note')).toEqual({ icon: 'arrows', tone: 'false-note', label: 'False note' })
+  expect(annotationPin('slack')).toEqual({ icon: 'scissors', tone: 'slack', label: 'Slack' })
+  expect(annotationPin('buried')).toEqual({ icon: 'link', tone: 'buried', label: 'Buried' })
+  expect(annotationPin('so-what')).toEqual({ icon: 'buildings', tone: 'so-what', label: 'So what' })
   expect(annotationPin('unclear')).toEqual({ icon: 'question', tone: 'unclear', label: 'Unclear' })
-  expect(annotationPin('structure')).toEqual({ icon: 'buildings', tone: 'structure', label: 'Structure' })
+  expect(annotationPin('tighten')).toEqual({ icon: 'scissors', tone: 'tighten', label: 'Tighten' })
 })
 
 test('card pins are one-per-comment and vertically non-overlapping', () => {

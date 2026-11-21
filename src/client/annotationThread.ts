@@ -1,7 +1,7 @@
 import type { AgentEvent } from '../../server/agentRun'
 import type { AnnotationMessage } from '../model/types'
 
-const BASE = (import.meta as any).env?.VITE_SERVER_URL ?? 'http://localhost:5199'
+const BASE = (import.meta as any).env?.VITE_SERVER_URL ?? 'http://localhost:5299'
 
 export type AnnotationThreadTarget =
   | { kind: 'card'; cardId: string; commentId: string }

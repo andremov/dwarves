@@ -50,8 +50,8 @@ const MAP: CardMap = {
   groups: [{ id: 'shape:g', cardIds: ['shape:c', 'shape:p'], memberCount: 2, bounds: { x: 0, y: 0, w: 2, h: 1 } }],
   feedback: [{
     id: 'shape:f', text: 'The middle needs a bridge', x: -100, y: 20,
-    authoredBy: 'codex', type: 'structure', reviewId: 'review-a',
-    reviewer: 'architect', resolved: false,
+    authoredBy: 'codex', type: 'so-what', reviewId: 'review-a',
+    reviewer: 'landing', resolved: false,
   }],
 }
 
@@ -62,8 +62,8 @@ test('enrichSelection reports each shape type with the right fields', () => {
     { id: 'shape:q', type: 'question', text: 'How deep?' },
     {
       id: 'shape:f', type: 'feedback', text: 'The middle needs a bridge',
-      authoredBy: 'codex', feedbackType: 'structure', reviewId: 'review-a',
-      reviewer: 'architect', resolved: false,
+      authoredBy: 'codex', feedbackType: 'so-what', reviewId: 'review-a',
+      reviewer: 'landing', resolved: false,
     },
     { id: 'shape:g', type: 'group', memberCount: 2 },
   ])
@@ -115,7 +115,7 @@ const CANVAS = {
         id: 'shape:f', typeName: 'shape', type: 'feedback', parentId: 'page:p', x: -100, y: 20,
         props: {
           w: 240, h: 96, text: 'The middle needs a bridge', authoredBy: 'codex',
-          type: 'structure', reviewId: 'review-a', reviewer: 'architect', resolved: false,
+          type: 'so-what', reviewId: 'review-a', reviewer: 'landing', resolved: false,
         },
       },
       'shape:grp': { id: 'shape:grp', typeName: 'shape', type: 'group', parentId: 'page:p', x: 0, y: 0, props: {} },
@@ -162,8 +162,8 @@ test('a reported selection comes back enriched with project, gists, and a timest
     { id: 'shape:q', type: 'question', text: 'How deep should the beds be?' },
     {
       id: 'shape:f', type: 'feedback', text: 'The middle needs a bridge',
-      authoredBy: 'codex', feedbackType: 'structure', reviewId: 'review-a',
-      reviewer: 'architect', resolved: false,
+      authoredBy: 'codex', feedbackType: 'so-what', reviewId: 'review-a',
+      reviewer: 'landing', resolved: false,
     },
     { id: 'shape:grp', type: 'group', memberCount: 2 },
   ])

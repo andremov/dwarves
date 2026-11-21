@@ -136,7 +136,7 @@ describe('convert note → prose', () => {
   test('conversion preserves the text, comments, and size', () => {
     const comments: Comment[] = [
       {
-        id: 'c1', type: 'needs-citation', text: 'source?', resolved: false, author: 'claude',
+        id: 'c1', type: 'told', text: 'source?', resolved: false, author: 'claude',
         reviewId: null,
         summary: null, summaryOfHash: null, summaryBy: null, summaryAt: null,
       },

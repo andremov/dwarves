@@ -16,14 +16,15 @@
 .elves-annotation-thread__reply-count { display: inline-flex; align-items: center; gap: 3px; color: var(--elves-ink-faint); font-size: 11px; font-weight: 650; }
 .elves-annotation-thread__preview-excerpt { display: -webkit-box; margin: 0; overflow: hidden; color: var(--elves-ink); font-size: 13px; line-height: 1.45; overflow-wrap: anywhere; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
 .elves-annotation-thread__type { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; }
-.elves-annotation-thread__type[data-type="needs-evidence"] { color: var(--elves-cc-evidence-label); }
-.elves-annotation-thread__type[data-type="weak-argument"] { color: var(--elves-cc-weak-label); }
-.elves-annotation-thread__type[data-type="needs-citation"] { color: var(--elves-cc-citation-label); }
-.elves-annotation-thread__type[data-type="wants-figure"] { color: var(--elves-cc-figure-label); }
-.elves-annotation-thread__type[data-type="counterpoint"] { color: var(--elves-cc-counter-label); }
+.elves-annotation-thread__type[data-type="abstract"] { color: var(--elves-cc-abstract-label); }
+.elves-annotation-thread__type[data-type="told"] { color: var(--elves-cc-told-label); }
+.elves-annotation-thread__type[data-type="unearned"] { color: var(--elves-cc-unearned-label); }
+.elves-annotation-thread__type[data-type="false-note"] { color: var(--elves-cc-falsenote-label); }
+.elves-annotation-thread__type[data-type="slack"] { color: var(--elves-cc-slack-label); }
+.elves-annotation-thread__type[data-type="buried"] { color: var(--elves-cc-buried-label); }
+.elves-annotation-thread__type[data-type="so-what"] { color: var(--elves-cc-sowhat-label); }
 .elves-annotation-thread__type[data-type="tighten"] { color: var(--elves-cc-tighten-label); }
 .elves-annotation-thread__type[data-type="unclear"] { color: var(--elves-cc-unclear-label); }
-.elves-annotation-thread__type[data-type="structure"] { color: var(--elves-cc-structure-label); }
 .elves-annotation-thread__type[data-type="freeform"] { color: var(--elves-cc-freeform-label); }
 .elves-annotation-thread__actions { display: inline-flex; align-items: center; gap: 4px; }
 .elves-annotation-thread__action-tooltip { position: relative; display: inline-flex; flex: 0 0 auto; }
@@ -94,14 +95,15 @@
   cursor: pointer;
   font: 700 15px/1 system-ui, sans-serif;
 }
-.elves-annotation-pin[data-type="needs-evidence"] { background: var(--elves-cc-evidence-label); border-color: var(--elves-cc-evidence-label); }
-.elves-annotation-pin[data-type="weak-argument"] { background: var(--elves-cc-weak-label); border-color: var(--elves-cc-weak-label); }
-.elves-annotation-pin[data-type="needs-citation"] { background: var(--elves-cc-citation-label); border-color: var(--elves-cc-citation-label); }
-.elves-annotation-pin[data-type="wants-figure"] { background: var(--elves-cc-figure-label); border-color: var(--elves-cc-figure-label); }
-.elves-annotation-pin[data-type="counterpoint"] { background: var(--elves-cc-counter-label); border-color: var(--elves-cc-counter-label); }
+.elves-annotation-pin[data-type="abstract"] { background: var(--elves-cc-abstract-label); border-color: var(--elves-cc-abstract-label); }
+.elves-annotation-pin[data-type="told"] { background: var(--elves-cc-told-label); border-color: var(--elves-cc-told-label); }
+.elves-annotation-pin[data-type="unearned"] { background: var(--elves-cc-unearned-label); border-color: var(--elves-cc-unearned-label); }
+.elves-annotation-pin[data-type="false-note"] { background: var(--elves-cc-falsenote-label); border-color: var(--elves-cc-falsenote-label); }
+.elves-annotation-pin[data-type="slack"] { background: var(--elves-cc-slack-label); border-color: var(--elves-cc-slack-label); }
+.elves-annotation-pin[data-type="buried"] { background: var(--elves-cc-buried-label); border-color: var(--elves-cc-buried-label); }
+.elves-annotation-pin[data-type="so-what"] { background: var(--elves-cc-sowhat-label); border-color: var(--elves-cc-sowhat-label); }
 .elves-annotation-pin[data-type="tighten"] { background: var(--elves-cc-tighten-label); border-color: var(--elves-cc-tighten-label); }
 .elves-annotation-pin[data-type="unclear"] { background: var(--elves-cc-unclear-label); border-color: var(--elves-cc-unclear-label); }
-.elves-annotation-pin[data-type="structure"] { background: var(--elves-cc-structure-label); border-color: var(--elves-cc-structure-label); }
 .elves-annotation-pin:hover { box-shadow: var(--elves-shadow-md); }
 .elves-annotation-pin:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--elves-surface), 0 0 0 4px var(--elves-focus-ring); }
 .elves-annotation-pin__icon {

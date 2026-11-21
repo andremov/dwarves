@@ -8,11 +8,11 @@ import { isChangeSet } from '../../src/model/changeset'
 const ALL_STATUSES: ReviewStatus[] = ['pending', 'in-progress', 'done', 'dismissed', 'failed']
 
 describe('PERSONALITIES', () => {
-  test('has exactly 5 entries, one per PersonalityId', () => {
-    expect(PERSONALITY_IDS).toHaveLength(5)
-    expect(Object.keys(PERSONALITIES)).toHaveLength(5)
+  test('has exactly 6 entries, one per PersonalityId', () => {
+    expect(PERSONALITY_IDS).toHaveLength(6)
+    expect(Object.keys(PERSONALITIES)).toHaveLength(6)
     expect(PERSONALITY_IDS.sort()).toEqual(
-      ['architect', 'devils-advocate', 'fact-checker', 'first-reader', 'trimmer'].sort(),
+      ['landing', 'specificity', 'anti-sentimentalist', 'cold-reader', 'pacing', 'voice'].sort(),
     )
   })
 
@@ -31,14 +31,14 @@ describe('PERSONALITIES', () => {
   })
 
   test('trimmer and fact-checker never ask questions (maxQuestions 0)', () => {
-    expect(PERSONALITIES.trimmer.maxQuestions).toBe(0)
-    expect(PERSONALITIES['fact-checker'].maxQuestions).toBe(0)
+    expect(PERSONALITIES.pacing.maxQuestions).toBe(0)
+    expect(PERSONALITIES['anti-sentimentalist'].maxQuestions).toBe(0)
   })
 
   test('the other three personalities do carry a question budget', () => {
-    expect(PERSONALITIES['devils-advocate'].maxQuestions).toBeGreaterThan(0)
-    expect(PERSONALITIES['first-reader'].maxQuestions).toBeGreaterThan(0)
-    expect(PERSONALITIES.architect.maxQuestions).toBeGreaterThan(0)
+    expect(PERSONALITIES['specificity'].maxQuestions).toBeGreaterThan(0)
+    expect(PERSONALITIES['cold-reader'].maxQuestions).toBeGreaterThan(0)
+    expect(PERSONALITIES.landing.maxQuestions).toBeGreaterThan(0)
   })
 
   test('every personality\'s commentTypes are valid CommentTypes accepted by the change-set validator', () => {
@@ -80,10 +80,10 @@ describe('isReviewStatus', () => {
 
 describe('makeReview', () => {
   test('defaults to pending, unclaimed, unfocused, zero comments, no error', () => {
-    const r = makeReview('rev-1', 'devils-advocate', '2026-07-08T10:00:00.000Z')
+    const r = makeReview('rev-1', 'specificity', '2026-07-08T10:00:00.000Z')
     expect(r).toEqual({
       id: 'rev-1',
-      personality: 'devils-advocate',
+      personality: 'specificity',
       status: 'pending',
       focus: null,
       requestedAt: '2026-07-08T10:00:00.000Z',
@@ -97,7 +97,7 @@ describe('makeReview', () => {
   })
 
   test('carries an explicit focus note through', () => {
-    const r = makeReview('rev-2', 'trimmer', '2026-07-08T10:00:00.000Z', 'just the opening section')
+    const r = makeReview('rev-2', 'pacing', '2026-07-08T10:00:00.000Z', 'just the opening section')
     expect(r.focus).toBe('just the opening section')
   })
 })
@@ -147,7 +147,7 @@ describe('canTransition', () => {
 
 describe('isReview', () => {
   test('accepts a round-tripped makeReview', () => {
-    const r = makeReview('rev-1', 'architect', '2026-07-08T10:00:00.000Z', 'the ending')
+    const r = makeReview('rev-1', 'landing', '2026-07-08T10:00:00.000Z', 'the ending')
     expect(isReview(r)).toBe(true)
     // Also survives a JSON round-trip (as reviews.json would produce).
     expect(isReview(JSON.parse(JSON.stringify(r)))).toBe(true)
@@ -155,7 +155,7 @@ describe('isReview', () => {
 
   test('accepts a fully-populated (claimed, completed) review', () => {
     const r: Review = {
-      id: 'rev-2', personality: 'fact-checker', status: 'done', focus: null,
+      id: 'rev-2', personality: 'anti-sentimentalist', status: 'done', focus: null,
       requestedAt: '2026-07-08T10:00:00.000Z', agent: 'claude',
       startedAt: '2026-07-08T10:05:00.000Z', completedAt: '2026-07-08T10:20:00.000Z',
       verdict: 'holds up', commentCount: 4, error: null,
@@ -164,13 +164,13 @@ describe('isReview', () => {
   })
 
   test('accepts a failed review carrying an error string', () => {
-    const base = makeReview('rev-3', 'architect', '2026-07-08T10:00:00.000Z')
+    const base = makeReview('rev-3', 'landing', '2026-07-08T10:00:00.000Z')
     const failed: Review = { ...base, status: 'failed', error: '`claude` is not installed' }
     expect(isReview(failed)).toBe(true)
   })
 
   test('rejects a non-string, non-null error', () => {
-    const base = makeReview('rev-1', 'trimmer', '2026-07-08T10:00:00.000Z')
+    const base = makeReview('rev-1', 'pacing', '2026-07-08T10:00:00.000Z')
     expect(isReview({ ...base, error: 42 })).toBe(false)
   })
 
@@ -178,13 +178,13 @@ describe('isReview', () => {
     // reviews.json from before the `error` field: the key is simply absent, so
     // reading it back yields `undefined`. That must validate — otherwise every
     // pre-upgrade review is dropped as malformed and vanishes from the panel.
-    const { error, ...legacy } = makeReview('rev-1', 'trimmer', '2026-07-08T10:00:00.000Z')
+    const { error, ...legacy } = makeReview('rev-1', 'pacing', '2026-07-08T10:00:00.000Z')
     expect('error' in legacy).toBe(false)
     expect(isReview(legacy)).toBe(true)
   })
 
   test('rejects junk: wrong types, missing fields, unknown personality/status', () => {
-    const base = makeReview('rev-1', 'trimmer', '2026-07-08T10:00:00.000Z')
+    const base = makeReview('rev-1', 'pacing', '2026-07-08T10:00:00.000Z')
     expect(isReview(null)).toBe(false)
     expect(isReview(42)).toBe(false)
     expect(isReview({ ...base, id: '' })).toBe(false)
@@ -202,27 +202,27 @@ describe('isReview', () => {
 
 describe('composeBrief', () => {
   test('includes the personality\'s own brief text', () => {
-    const p = PERSONALITIES['devils-advocate']
+    const p = PERSONALITIES['specificity']
     const brief = composeBrief(p, null)
     expect(brief).toContain(p.brief)
   })
 
   test('states the annotation/question budget when the personality asks questions', () => {
-    const p = PERSONALITIES['devils-advocate']
+    const p = PERSONALITIES['specificity']
     const brief = composeBrief(p, null)
     expect(brief).toContain(`at most ${p.maxComments} annotations`)
     expect(brief).toContain(`${p.maxQuestions} question cards`)
   })
 
   test('uses question-less phrasing for a personality with maxQuestions 0 (trimmer)', () => {
-    const p = PERSONALITIES.trimmer
+    const p = PERSONALITIES.pacing
     const brief = composeBrief(p, null)
     expect(brief).toContain('NO question cards')
     expect(brief).not.toContain('0 question cards') // never states a numeric zero budget
   })
 
   test('includes the shared pass rules', () => {
-    const brief = composeBrief(PERSONALITIES.architect, null)
+    const brief = composeBrief(PERSONALITIES.landing, null)
     expect(brief).toContain('How to run the pass:')
     expect(brief).toContain('resolved floating feedback')
     expect(brief).toContain('retry')
@@ -230,14 +230,14 @@ describe('composeBrief', () => {
   })
 
   test('includes the focus note only when a focus is given', () => {
-    const withFocus = composeBrief(PERSONALITIES['first-reader'], 'just the opening section')
+    const withFocus = composeBrief(PERSONALITIES['cold-reader'], 'just the opening section')
     expect(withFocus).toContain('The user scoped this pass: "just the opening section"')
 
-    const withoutFocus = composeBrief(PERSONALITIES['first-reader'], null)
+    const withoutFocus = composeBrief(PERSONALITIES['cold-reader'], null)
     expect(withoutFocus).not.toContain('The user scoped this pass')
 
     // Whitespace-only focus is treated the same as no focus.
-    const blankFocus = composeBrief(PERSONALITIES['first-reader'], '   ')
+    const blankFocus = composeBrief(PERSONALITIES['cold-reader'], '   ')
     expect(blankFocus).not.toContain('The user scoped this pass')
   })
 })

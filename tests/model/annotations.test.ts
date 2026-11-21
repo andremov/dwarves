@@ -7,17 +7,17 @@ import {
 
 test('attached marker uses first unresolved comment, a bounded gist and total count', () => {
   expect(attachedAnnotationMarker([
-    { id: 'one', type: 'needs-evidence', text: 'Needs a source.', resolved: false },
+    { id: 'one', type: 'abstract', text: 'Needs a source.', resolved: false },
     { id: 'two', type: 'tighten', text: 'Second', resolved: false },
     { id: 'three', type: null, text: 'Resolved', resolved: true },
-  ] as any)).toEqual({ type: 'needs-evidence', label: 'Needs a source.', count: 2 })
+  ] as any)).toEqual({ type: 'abstract', label: 'Needs a source.', count: 2 })
 })
 
 test('attached marker prefers a model comment summary and bounds its label', () => {
   const summary = 'A concise model summary.'
   expect(attachedAnnotationMarker([
-    { type: 'structure', text: 'Long source text', summary, resolved: false },
-  ] as any)).toEqual({ type: 'structure', label: summary, count: 1 })
+    { type: 'so-what', text: 'Long source text', summary, resolved: false },
+  ] as any)).toEqual({ type: 'so-what', label: summary, count: 1 })
 
   const longText = 'word '.repeat(30)
   expect(attachedAnnotationMarker([{ type: null, text: longText, resolved: false }] as any)!.label.length).toBeLessThanOrEqual(48)
@@ -35,7 +35,7 @@ test('overview mode starts at the existing gist threshold', () => {
 })
 
 test('resolved feedback has no marker', () => {
-  expect(feedbackAnnotationMarker({ text: 'Done', type: 'structure', resolved: true } as any)).toBeNull()
+  expect(feedbackAnnotationMarker({ text: 'Done', type: 'so-what', resolved: true } as any)).toBeNull()
 })
 
 test('open feedback marker uses its type, bounded gist and count one', () => {

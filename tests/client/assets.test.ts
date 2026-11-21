@@ -40,8 +40,8 @@ test('asset URLs react to committed project changes and clear without stale valu
 
   expect(urls).toEqual([
     '',
-    'http://localhost:5199/projects/alpha%20project/assets/image.png',
-    'http://localhost:5199/projects/beta/assets/image.png',
+    'http://localhost:5299/projects/alpha%20project/assets/image.png',
+    'http://localhost:5299/projects/beta/assets/image.png',
     '',
   ])
 })
@@ -63,10 +63,10 @@ test('the project binding is render-pure and synchronizes only after commit with
     root.render(createElement(Binding, { projectId: 'new' }))
   })
   expect(urlsSeenDuringRender).toEqual([
-    'http://localhost:5199/projects/old/assets/image.png',
+    'http://localhost:5299/projects/old/assets/image.png',
   ])
   expect(assetUrl('image.png')).toBe(
-    'http://localhost:5199/projects/new/assets/image.png',
+    'http://localhost:5299/projects/new/assets/image.png',
   )
 
   act(() => {
@@ -103,14 +103,14 @@ test('StrictMode replay and remount leave the committed project active, then cle
   act(() => { root.render(tree('alpha')) })
   expect(renders).toBe(2)
   expect(urlsSeenDuringRender).toEqual([
-    'http://localhost:5199/projects/old/assets/image.png',
-    'http://localhost:5199/projects/old/assets/image.png',
+    'http://localhost:5299/projects/old/assets/image.png',
+    'http://localhost:5299/projects/old/assets/image.png',
   ])
   expect(committedUrls.slice(0, 4)).toEqual([
-    'http://localhost:5199/projects/old/assets/image.png',
-    'http://localhost:5199/projects/alpha/assets/image.png',
+    'http://localhost:5299/projects/old/assets/image.png',
+    'http://localhost:5299/projects/alpha/assets/image.png',
     '',
-    'http://localhost:5199/projects/alpha/assets/image.png',
+    'http://localhost:5299/projects/alpha/assets/image.png',
   ])
   expect(assetUrl('image.png')).toContain('/projects/alpha/assets/image.png')
   act(() => { root.render(tree('beta')) })
@@ -216,7 +216,7 @@ test('uploadAsset keeps its explicit project-scoped API', async () => {
 
   await expect(uploadAsset('alpha project', file)).resolves.toBe('asset.png')
   expect(fetchMock).toHaveBeenCalledWith(
-    'http://localhost:5199/projects/alpha%20project/assets',
+    'http://localhost:5299/projects/alpha%20project/assets',
     {
       method: 'POST',
       headers: { 'content-type': 'image/png' },

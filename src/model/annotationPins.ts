@@ -19,14 +19,15 @@ export type CardAnnotationPin = {
 }
 
 const PIN_TOKENS: Record<CommentType | 'freeform', AnnotationPin> = {
-  'needs-evidence': { icon: 'warning', tone: 'needs-evidence', label: 'Needs evidence' },
-  'weak-argument': { icon: 'chart-down', tone: 'weak-argument', label: 'Weak argument' },
-  'needs-citation': { icon: 'link', tone: 'needs-citation', label: 'Needs citation' },
-  'wants-figure': { icon: 'image', tone: 'wants-figure', label: 'Wants figure' },
-  counterpoint: { icon: 'arrows', tone: 'counterpoint', label: 'Counterpoint' },
-  tighten: { icon: 'scissors', tone: 'tighten', label: 'Tighten' },
+  abstract: { icon: 'warning', tone: 'abstract', label: 'Abstract' },
+  told: { icon: 'image', tone: 'told', label: 'Told' },
+  unearned: { icon: 'chart-down', tone: 'unearned', label: 'Unearned' },
+  'false-note': { icon: 'arrows', tone: 'false-note', label: 'False note' },
+  slack: { icon: 'scissors', tone: 'slack', label: 'Slack' },
+  buried: { icon: 'link', tone: 'buried', label: 'Buried' },
+  'so-what': { icon: 'buildings', tone: 'so-what', label: 'So what' },
   unclear: { icon: 'question', tone: 'unclear', label: 'Unclear' },
-  structure: { icon: 'buildings', tone: 'structure', label: 'Structure' },
+  tighten: { icon: 'scissors', tone: 'tighten', label: 'Tighten' },
   freeform: { icon: 'comment', tone: 'freeform', label: 'Comment' },
 }
 

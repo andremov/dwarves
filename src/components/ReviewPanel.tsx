@@ -24,14 +24,15 @@ interface Props {
 // type, so the panel row and the comments that pass leaves on the canvas read
 // as the same voice.
 const TYPE_TONE: Record<CommentType, string> = {
-  'needs-evidence': 'var(--elves-cc-evidence-label)',
-  'weak-argument': 'var(--elves-cc-weak-label)',
-  'needs-citation': 'var(--elves-cc-citation-label)',
-  'wants-figure': 'var(--elves-cc-figure-label)',
-  counterpoint: 'var(--elves-cc-counter-label)',
-  tighten: 'var(--elves-cc-tighten-label)',
+  abstract: 'var(--elves-cc-abstract-label)',
+  told: 'var(--elves-cc-told-label)',
+  unearned: 'var(--elves-cc-unearned-label)',
+  'false-note': 'var(--elves-cc-falsenote-label)',
+  slack: 'var(--elves-cc-slack-label)',
+  buried: 'var(--elves-cc-buried-label)',
+  'so-what': 'var(--elves-cc-sowhat-label)',
   unclear: 'var(--elves-cc-unclear-label)',
-  structure: 'var(--elves-cc-structure-label)',
+  tighten: 'var(--elves-cc-tighten-label)',
 }
 
 function personalityTone(id: PersonalityId): string {

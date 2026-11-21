@@ -69,7 +69,7 @@
   --elves-highlight: inset 0 1px 0 oklch(1 0 0 / 0.65);
 
   /* ---- Claude-authorship accent — warm orange, distinct from the muted
-     weak-argument comment tone, so a Claude-written section label reads
+     told comment tone, so a Claude-written section label reads
      unambiguously against the cream background. ---- */
   --elves-claude-accent: oklch(0.62 0.17 45);
 
@@ -96,51 +96,58 @@
 
   /* ---- Comment colour ramps — calm, desaturated bands. Each type gets a
      readable label colour, a very light tinted background, and a subtle tinted
-     border. Freeform = yellow, weak-argument = orange, needs-evidence = red,
-     needs-citation = green. ---- */
+     border.
+
+     The nine types walk the hue wheel so no two adjacent-in-meaning notes look
+     alike at a glance: the two "you skipped the real thing" faults sit in the
+     warm reds (abstract = red, told = orange), freeform stays yellow, the one
+     note that is a FIND rather than a fault is green (buried), the reader-side
+     signals are teal/blue (unclear, tighten), and the three judgement calls
+     climb into the cools and rose (slack = indigo, so-what = purple,
+     false-note = violet, unearned = rose). ---- */
   --elves-cc-freeform-label:  oklch(0.560 0.070 92);
   --elves-cc-freeform-bg:     oklch(0.968 0.024 92);
   --elves-cc-freeform-border: oklch(0.895 0.040 92);
 
-  --elves-cc-weak-label:  oklch(0.585 0.095 58);
-  --elves-cc-weak-bg:     oklch(0.966 0.030 58);
-  --elves-cc-weak-border: oklch(0.890 0.048 58);
+  /* abstract = red: the cardinal sin of the genre, so it carries the strongest
+     warning hue. */
+  --elves-cc-abstract-label:  oklch(0.560 0.100 30);
+  --elves-cc-abstract-bg:     oklch(0.965 0.028 30);
+  --elves-cc-abstract-border: oklch(0.888 0.045 30);
 
-  --elves-cc-evidence-label:  oklch(0.560 0.100 30);
-  --elves-cc-evidence-bg:     oklch(0.965 0.028 30);
-  --elves-cc-evidence-border: oklch(0.888 0.045 30);
+  --elves-cc-told-label:  oklch(0.585 0.095 58);
+  --elves-cc-told-bg:     oklch(0.966 0.030 58);
+  --elves-cc-told-border: oklch(0.890 0.048 58);
 
-  --elves-cc-citation-label:  oklch(0.520 0.060 152);
-  --elves-cc-citation-bg:     oklch(0.966 0.022 152);
-  --elves-cc-citation-border: oklch(0.892 0.034 152);
-
-  /* wants-figure = violet: a distinct, non-warning hue that reads as "this wants
-     a visual" rather than "this is wrong" — the four above flag prose weaknesses;
-     this one is a creative nudge, so it sits apart on the colour wheel. */
-  --elves-cc-figure-label:  oklch(0.520 0.110 300);
-  --elves-cc-figure-bg:     oklch(0.966 0.030 300);
-  --elves-cc-figure-border: oklch(0.892 0.048 300);
-
-  /* ---- Review-pass comment ramps (src/model/reviews.ts) — same calm bands.
-     counterpoint = rose (an objection to answer, warm but distinct from
-     weak-argument's orange and needs-evidence's red); tighten = blue (a cool
-     line-edit note, not a warning); unclear = teal (a reader signal); structure
-     = indigo (the skeleton, sitting near wants-figure's violet but flatter). ---- */
-  --elves-cc-counter-label:  oklch(0.560 0.105 355);
-  --elves-cc-counter-bg:     oklch(0.966 0.026 355);
-  --elves-cc-counter-border: oklch(0.890 0.044 355);
-
-  --elves-cc-tighten-label:  oklch(0.545 0.085 235);
-  --elves-cc-tighten-bg:     oklch(0.966 0.022 235);
-  --elves-cc-tighten-border: oklch(0.892 0.038 235);
+  /* buried = green: the only note that tells the writer they did something
+     RIGHT and hid it. Deliberately not a warning colour. */
+  --elves-cc-buried-label:  oklch(0.520 0.060 152);
+  --elves-cc-buried-bg:     oklch(0.966 0.022 152);
+  --elves-cc-buried-border: oklch(0.892 0.034 152);
 
   --elves-cc-unclear-label:  oklch(0.530 0.070 185);
   --elves-cc-unclear-bg:     oklch(0.966 0.022 185);
   --elves-cc-unclear-border: oklch(0.892 0.034 185);
 
-  --elves-cc-structure-label:  oklch(0.530 0.095 270);
-  --elves-cc-structure-bg:     oklch(0.966 0.026 270);
-  --elves-cc-structure-border: oklch(0.892 0.042 270);
+  --elves-cc-tighten-label:  oklch(0.545 0.085 210);
+  --elves-cc-tighten-bg:     oklch(0.966 0.022 210);
+  --elves-cc-tighten-border: oklch(0.892 0.038 210);
+
+  --elves-cc-slack-label:  oklch(0.545 0.085 235);
+  --elves-cc-slack-bg:     oklch(0.966 0.022 235);
+  --elves-cc-slack-border: oklch(0.892 0.038 235);
+
+  --elves-cc-sowhat-label:  oklch(0.530 0.095 270);
+  --elves-cc-sowhat-bg:     oklch(0.966 0.026 270);
+  --elves-cc-sowhat-border: oklch(0.892 0.042 270);
+
+  --elves-cc-falsenote-label:  oklch(0.520 0.110 300);
+  --elves-cc-falsenote-bg:     oklch(0.966 0.030 300);
+  --elves-cc-falsenote-border: oklch(0.892 0.048 300);
+
+  --elves-cc-unearned-label:  oklch(0.560 0.105 355);
+  --elves-cc-unearned-bg:     oklch(0.966 0.026 355);
+  --elves-cc-unearned-border: oklch(0.890 0.044 355);
 
   /* Figure card sketch-frame: a soft ink dash for a human-planned figure. A
      Claude-suggested figure tints its frame with the warm authorship accent

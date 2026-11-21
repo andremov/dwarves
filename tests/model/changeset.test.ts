@@ -46,7 +46,7 @@ describe('isChangeSet', () => {
     const cs = {
       id: 'x', author: 'claude',
       ops: [
-        { kind: 'add_comment', cardId: 'card1', comment: { type: 'needs-evidence', text: 'hi' } },
+        { kind: 'add_comment', cardId: 'card1', comment: { type: 'abstract', text: 'hi' } },
         { kind: 'merge_notes', cardIds: ['a', 'b'] },
         { kind: 'move_cards', moves: [{ cardId: 'a', x: 10, y: 20 }] },
         { kind: 'create_note_card', text: 'transcribed words', x: 10, y: 20 },
@@ -103,13 +103,13 @@ describe('isChangeSet', () => {
   test('accepts a wants-figure comment (Claude flagging a spot for a visual)', () => {
     const cs = {
       id: 'x', author: 'claude',
-      ops: [{ kind: 'add_comment', cardId: 'card1', comment: { type: 'wants-figure', text: 'this spatial relationship is a diagram' } }],
+      ops: [{ kind: 'add_comment', cardId: 'card1', comment: { type: 'buried', text: 'this spatial relationship is a diagram' } }],
     }
     expect(isChangeSet(cs)).toBe(true)
   })
 
   test('accepts the four review-pass comment types (counterpoint, tighten, unclear, structure)', () => {
-    for (const type of ['counterpoint', 'tighten', 'unclear', 'structure']) {
+    for (const type of ['unearned', 'tighten', 'unclear', 'so-what']) {
       const cs = {
         id: 'x', author: 'claude',
         ops: [{ kind: 'add_comment', cardId: 'card1', comment: { type, text: 'a review note' } }],
@@ -121,7 +121,7 @@ describe('isChangeSet', () => {
   test('add_comment accepts a reviewId string, tagging the comment to a review pass', () => {
     const cs = {
       id: 'x', author: 'claude',
-      ops: [{ kind: 'add_comment', cardId: 'card1', comment: { type: 'counterpoint', text: 'the opposing view', reviewId: 'rev-1' } }],
+      ops: [{ kind: 'add_comment', cardId: 'card1', comment: { type: 'unearned', text: 'the opposing view', reviewId: 'rev-1' } }],
     }
     expect(isChangeSet(cs)).toBe(true)
   })
@@ -154,7 +154,7 @@ describe('isChangeSet', () => {
   test('accepts floating feedback creation and resolution', () => {
     expect(isChangeSet({ id: 'x', author: 'claude', ops: [
       { kind: 'create_feedback', text: 'The middle needs a bridge', x: -100, y: 20,
-        feedback: { type: 'structure', reviewId: 'rev-1', reviewer: 'architect' } },
+        feedback: { type: 'so-what', reviewId: 'rev-1', reviewer: 'landing' } },
       { kind: 'resolve_feedback', feedbackId: 'shape:feedback' },
     ] })).toBe(true)
     expect(isChangeSet({ id: 'x', author: 'claude', ops: [
@@ -162,7 +162,7 @@ describe('isChangeSet', () => {
     ] })).toBe(false)
     expect(isChangeSet({ id: 'x', author: 'claude', ops: [
       { kind: 'create_feedback', text: 'x', x: 0, y: 0,
-        feedback: { type: 'structure', reviewer: 'invented-reviewer' } },
+        feedback: { type: 'so-what', reviewer: 'invented-reviewer' } },
     ] })).toBe(false)
   })
 

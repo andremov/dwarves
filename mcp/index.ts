@@ -33,8 +33,8 @@ import {
 } from './tools'
 
 const COMMENT_TYPE = z.enum([
-  'needs-evidence', 'weak-argument', 'needs-citation', 'wants-figure',
-  'counterpoint', 'tighten', 'unclear', 'structure',
+  'abstract', 'told', 'unearned', 'false-note',
+  'slack', 'buried', 'so-what', 'unclear', 'tighten',
 ])
 const PERSONALITY = z.enum(PERSONALITY_IDS as [PersonalityId, ...PersonalityId[]])
 const REF_TYPE = z.enum(['paper', 'article', 'book', 'software', 'social', 'video', 'wiki', 'link'])
@@ -66,7 +66,7 @@ The one house rule, non-negotiable: ONE SENTENCE. Every comment, question, and f
 
 Be sparing as well as brief: a few pointed notes beat a dozen, and one precise question beats five vague ones. You annotate and suggest; you never write the user's prose for them.
 
-The user can also summon a REVIEW PASS — a bounded, in-character editorial read by one of five personalities (Devil's Advocate, Fact-Checker, Trimmer, First Reader, Architect). When you start work on a canvas, check list_reviews: a pending review is the user's summons waiting for you — claim it with start_review and follow the brief it returns. If the user asks for that kind of read in chat ("play devil's advocate on this"), open the pass with start_review(personality) instead of free-styling, so their review panel shows the pass and groups your notes.
+The user can also summon a REVIEW PASS — a bounded, in-character editorial read by one of six goblins (The Specificity Goblin, The Cold Reader, The Landing, The Voice Goblin, The Anti-Sentimentalist, The Pacing Goblin). When you start work on a canvas, check list_reviews: a pending review is the user's summons waiting for you — claim it with start_review and follow the brief it returns. If the user asks for that kind of read in chat ("play devil's advocate on this"), open the pass with start_review(personality) instead of free-styling, so their review panel shows the pass and groups your notes.
 
 ${HOUSE_STYLE_BRIEF}`
 
@@ -208,7 +208,7 @@ export function createMcpServer(baseUrl: string): McpServer {
 
   server.tool(
     'add_comment',
-    "Attach a comment to a card in a project. Use a typed comment to flag a weakness in the user's PROSE (needs-evidence, weak-argument, needs-citation, counterpoint, tighten, unclear, structure), or `wants-figure` to point out a passage that would carry more as a visual. Omit type for a freeform note. ONE sentence — two only if truly necessary, never more. Reply with only the note itself: no preamble, no hedging. Pass reviewId during a review pass so the panel can group its notes. You never write or edit card text — only comments. (To drop an actual figure placeholder on the canvas, use create_figure_card.)",
+    "Attach a comment to a card in a project. Use a typed comment to flag a weakness in the user's PROSE. The types name the failure modes of reflective and opinion writing: `abstract` (generality where a concrete particular belongs), `told` (the feeling named instead of rendered), `unearned` (a beat or conclusion the piece hasn't paid for), `false-note` (the voice slips into someone else's register), `slack` (throat-clearing, circling, a sagging middle), `buried` (the best line or the real ending hidden mid-paragraph), `so-what` (the reflection never turns or arrives), `unclear` (a cold reader loses the thread), `tighten` (many words for few). Omit type for a freeform note. ONE sentence — two only if truly necessary, never more. Reply with only the note itself: no preamble, no hedging. Pass reviewId during a review pass so the panel can group its notes. You never write or edit card text — only comments. (To drop an actual figure placeholder on the canvas, use create_figure_card.)",
     {
       project: PROJECT,
       cardId: z.string(),
@@ -230,7 +230,7 @@ export function createMcpServer(baseUrl: string): McpServer {
 
   server.tool(
     'list_reviews',
-    "List a project's REVIEW PASSES — bounded, in-character editorial reads by a summoned personality (devils-advocate | fact-checker | trimmer | first-reader | architect). Returns each pass's id, personality, status (pending | in-progress | done | dismissed), focus (the user's optional scope note), agent, verdict, and commentCount. A PENDING review is the user's summons from the app waiting for an agent: when you start work on a canvas — or whenever the user asks 'any reviews waiting?' — check this and claim pending passes with start_review(reviewId). Never re-run a done pass unprompted, and treat a dismissed one as waved off.",
+    "List a project's REVIEW PASSES — bounded, in-character editorial reads by a summoned goblin (specificity | cold-reader | landing | voice | anti-sentimentalist | pacing). Returns each pass's id, personality, status (pending | in-progress | done | dismissed), focus (the user's optional scope note), agent, verdict, and commentCount. A PENDING review is the user's summons from the app waiting for an agent: when you start work on a canvas — or whenever the user asks 'any reviews waiting?' — check this and claim pending passes with start_review(reviewId). Never re-run a done pass unprompted, and treat a dismissed one as waved off.",
     { project: PROJECT },
     async ({ project }) => ({
       content: [{ type: 'text', text: JSON.stringify({ reviews: await listReviewsTool(baseUrl, project) }) }],
@@ -239,7 +239,7 @@ export function createMcpServer(baseUrl: string): McpServer {
 
   server.tool(
     'start_review',
-    "Open a REVIEW PASS and receive its working brief. Two ways in: pass `reviewId` to CLAIM a pending pass the user summoned from the app (from list_reviews — always check for one first), or pass `personality` to start an ad-hoc pass when the user asks for that kind of read in chat ('play devil's advocate', 'where do I need citations?', 'help me tighten this', 'read it cold', 'check the structure'). Never open an ad-hoc pass when a pending one of the same personality is waiting — claim it instead. Returns { reviewId, personality, focus, instructions }: follow the instructions exactly — read the whole canvas map and every scoped card first, stay in character, respect the annotation/question budgets, tag every annotation with the reviewId, then finish with complete_review. The five personalities: devils-advocate (argues back: counterpoints, weak reasoning), fact-checker (unsupported claims, missing citations), trimmer (concision: what to compress, never rewrites), first-reader (a cold reader's confusion), architect (structure: order, bridges, shape).",
+    "Open a REVIEW PASS and receive its working brief. Two ways in: pass `reviewId` to CLAIM a pending pass the user summoned from the app (from list_reviews — always check for one first), or pass `personality` to start an ad-hoc pass when the user asks for that kind of read in chat ('where did I go vague?', 'read it cold', 'does this land?', 'do I sound like myself here?', 'is this sentimental?', 'where does it drag?'). Never open an ad-hoc pass when a pending one of the same personality is waiting — claim it instead. Returns { reviewId, personality, focus, instructions }: follow the instructions exactly — read the whole canvas map and every scoped card first, stay in character, respect the annotation/question budgets, tag every annotation with the reviewId, then finish with complete_review. The six goblins: specificity (abstraction where a concrete detail belongs — asks the questions the detail would answer), cold-reader (a stranger's confusion on one pass), landing (whether the piece arrives, and where the real ending is buried), voice (register slips and borrowed cadence — never proposes wording), anti-sentimentalist (feeling that is told rather than rendered, or bigger than what was shown), pacing (throat-clearing, circling, the sagging middle).",
     {
       project: PROJECT,
       reviewId: z.string().optional().describe('A pending review to claim, from list_reviews.'),
@@ -508,7 +508,7 @@ async function main() {
   // agents — an OpenAI model, an open-source model — can run the same server and
   // mark their own notes: set ELVES_AGENT=openai. Defaults to 'claude'.
   setAgentId(process.env.ELVES_AGENT ?? 'claude')
-  const server = createMcpServer(process.env.ELVES_URL ?? 'http://localhost:5199')
+  const server = createMcpServer(process.env.ELVES_URL ?? 'http://localhost:5299')
   await server.connect(new StdioServerTransport())
 }
 

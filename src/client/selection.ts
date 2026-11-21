@@ -1,6 +1,6 @@
 import { react, type Editor } from 'tldraw'
 
-const BASE = (import.meta as any).env?.VITE_SERVER_URL ?? 'http://localhost:5199'
+const BASE = (import.meta as any).env?.VITE_SERVER_URL ?? 'http://localhost:5299'
 
 // Report the browser's current canvas selection UP to the server so the agent
 // can resolve "this" / "these" via the MCP read_selection tool. The mirror image

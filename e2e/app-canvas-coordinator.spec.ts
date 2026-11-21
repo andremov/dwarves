@@ -139,7 +139,7 @@ test('overlapping review requests keep project transitions locked until both set
 test('summon and dismiss stay locked through lost responses and failed refresh', async ({ page }) => {
   const review = {
     id: '',
-    personality: 'architect',
+    personality: 'landing',
     status: 'pending',
     focus: null,
     requestedAt: '2026-07-14T12:00:00.000Z',
@@ -181,16 +181,16 @@ test('summon and dismiss stay locked through lost responses and failed refresh',
   await page.goto('/')
   await expect(page.getByTestId('new-prose')).toBeEnabled()
   await page.getByTestId('review-button').click()
-  await page.getByTestId('review-summon-architect').click()
+  await page.getByTestId('review-summon-landing').click()
 
-  const pass = page.getByTestId('review-pass-architect')
+  const pass = page.getByTestId('review-pass-landing')
   await expect.poll(() => summonBodies.length).toBe(1)
   await expect(page.getByTestId('project-switcher')).toBeDisabled()
   await expect(pass).toHaveAttribute('data-status', 'pending')
   expect(summonBodies[1]).toEqual(summonBodies[0])
   await expect(page.getByTestId('project-switcher')).toBeDisabled()
 
-  await page.getByTestId('review-dismiss-architect').click()
+  await page.getByTestId('review-dismiss-landing').click()
   await expect.poll(() => dismissBodies.length).toBe(1)
   await expect(page.getByTestId('project-switcher')).toBeDisabled()
   await expect(pass).toHaveCount(0)
@@ -201,7 +201,7 @@ test('summon and dismiss stay locked through lost responses and failed refresh',
 test('retry stays active through a lost response and failed refresh', async ({ page }) => {
   const review = {
     id: 'rev-retry',
-    personality: 'trimmer',
+    personality: 'pacing',
     status: 'failed',
     focus: null,
     requestedAt: '2026-07-14T12:00:00.000Z',
@@ -238,11 +238,11 @@ test('retry stays active through a lost response and failed refresh', async ({ p
   await page.goto('/')
   await expect(page.getByTestId('new-prose')).toBeEnabled()
   await page.getByTestId('review-button').click()
-  await page.getByTestId('review-retry-trimmer').click()
+  await page.getByTestId('review-retry-pacing').click()
 
   await expect.poll(() => retryBodies.length).toBe(1)
   await expect(page.getByTestId('project-switcher')).toBeDisabled()
-  await expect(page.getByTestId('review-pass-trimmer')).toHaveAttribute('data-status', 'pending')
+  await expect(page.getByTestId('review-pass-pacing')).toHaveAttribute('data-status', 'pending')
   expect(retryBodies[1]).toEqual(retryBodies[0])
   await expect(page.getByTestId('project-switcher')).toBeDisabled()
 })

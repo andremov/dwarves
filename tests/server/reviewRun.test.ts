@@ -174,7 +174,7 @@ test('summon records the active run before awaiting its review broadcast', async
   const fake = makeFakeRunner({ status: 'accepted' }, () => order.push('run'))
   const app = await appWithRunner(fake.runner, () => order.push('broadcast'))
 
-  await request(app).post('/projects/essay/reviews').send({ personality: 'trimmer' })
+  await request(app).post('/projects/essay/reviews').send({ personality: 'pacing' })
 
   expect(order.slice(0, 2)).toEqual(['run', 'broadcast'])
 })
@@ -202,7 +202,7 @@ async function waitForReview(
 test('summoning fires a run keyed review:<id> with the review prompt', async () => {
   const fake = makeFakeRunner()
   const app = await appWithRunner(fake.runner)
-  const created = await request(app).post('/projects/essay/reviews').send({ personality: 'trimmer' })
+  const created = await request(app).post('/projects/essay/reviews').send({ personality: 'pacing' })
   const reviewId = created.body.review.id
 
   expect(fake.calls).toHaveLength(1)
@@ -217,7 +217,7 @@ test('summoning fires a run keyed review:<id> with the review prompt', async () 
 test('summon is idempotent for a stable client review id', async () => {
   const fake = makeFakeRunner()
   const app = await appWithRunner(fake.runner)
-  const body = { reviewId: 'rev-client-a', personality: 'trimmer' }
+  const body = { reviewId: 'rev-client-a', personality: 'pacing' }
 
   const first = await request(app).post('/projects/essay/reviews').send(body)
   const duplicate = await request(app).post('/projects/essay/reviews').send(body)
@@ -234,7 +234,7 @@ test('summon reserves the project before metadata work so concurrent rename is r
   const app = await appWithRunner(fake.runner)
 
   const summoning = request(app).post('/projects/essay/reviews').send({
-    reviewId: 'rev-client-a', personality: 'trimmer',
+    reviewId: 'rev-client-a', personality: 'pacing',
   })
   void summoning.then(() => {})
   await reserved
@@ -247,7 +247,7 @@ test('summon reserves the project before metadata work so concurrent rename is r
 test('a run that errors marks the review failed with the captured message', async () => {
   const fake = makeFakeRunner()
   const app = await appWithRunner(fake.runner)
-  const created = await request(app).post('/projects/essay/reviews').send({ personality: 'trimmer' })
+  const created = await request(app).post('/projects/essay/reviews').send({ personality: 'pacing' })
   const reviewId = created.body.review.id
   const key = `review:${reviewId}`
 
@@ -263,7 +263,7 @@ test('launch broadcasts its durable failure when a post-transition read fails', 
   const broadcasts: Review[][] = []
   const fake = makeFakeRunner()
   const app = await appWithRunner(fake.runner, (_projectId, reviews) => broadcasts.push(reviews))
-  const created = await request(app).post('/projects/essay/reviews').send({ personality: 'trimmer' })
+  const created = await request(app).post('/projects/essay/reviews').send({ personality: 'pacing' })
   const reviewId = created.body.review.id
   broadcasts.length = 0
   reviewReadFailure.failTerminalReadOnce = true
@@ -285,7 +285,7 @@ test('launch settlement retains its lease across a transient persistence failure
       if (attempts === 1) throw new Error('transient persistence failure')
     },
   })
-  const created = await request(app).post('/projects/essay/reviews').send({ personality: 'trimmer' })
+  const created = await request(app).post('/projects/essay/reviews').send({ personality: 'pacing' })
   const key = `review:${created.body.review.id}`
 
   fake.finish(key)
@@ -303,7 +303,7 @@ test('launch settlement retains its lease across a transient persistence failure
 test('a run that exits with no captured error still fails the review, with a generic message', async () => {
   const fake = makeFakeRunner()
   const app = await appWithRunner(fake.runner)
-  const created = await request(app).post('/projects/essay/reviews').send({ personality: 'trimmer' })
+  const created = await request(app).post('/projects/essay/reviews').send({ personality: 'pacing' })
   const reviewId = created.body.review.id
   fake.finish(`review:${reviewId}`) // exits clean, but never claimed/completed the pass
 
@@ -314,7 +314,7 @@ test('a run that exits with no captured error still fails the review, with a gen
 test('a run that completes (claims + finishes via the status route) leaves the review done', async () => {
   const fake = makeFakeRunner()
   const app = await appWithRunner(fake.runner)
-  const created = await request(app).post('/projects/essay/reviews').send({ personality: 'trimmer' })
+  const created = await request(app).post('/projects/essay/reviews').send({ personality: 'pacing' })
   const reviewId = created.body.review.id
   const key = `review:${reviewId}`
 
@@ -336,7 +336,7 @@ test('dismissing mid-run cancels the child and the review stays dismissed', asyn
   const cancelReturnGate = new Promise<void>((resolve) => { releaseCancellation = resolve })
   const fake = makeFakeRunner({ status: 'accepted' }, () => {}, { cancelReturnGate })
   const app = await appWithRunner(fake.runner)
-  const created = await request(app).post('/projects/essay/reviews').send({ personality: 'trimmer' })
+  const created = await request(app).post('/projects/essay/reviews').send({ personality: 'pacing' })
   const reviewId = created.body.review.id
   const key = `review:${reviewId}`
   expect(fake.calls).toHaveLength(1) // the summon already launched a run
@@ -377,7 +377,7 @@ test('dismissing mid-run cancels the child and the review stays dismissed', asyn
 test('dismiss is idempotent after a lost successful response', async () => {
   const app = await appWithRunner(undefined)
   const created = await request(app).post('/projects/essay/reviews').send({
-    reviewId: 'rev-client-a', personality: 'trimmer',
+    reviewId: 'rev-client-a', personality: 'pacing',
   })
   const url = `/projects/essay/reviews/${created.body.review.id}/status`
 
@@ -400,7 +400,7 @@ test('dismiss settlement retains its lease across a transient persistence failur
       if (attempts === 1) throw new Error('transient persistence failure')
     },
   })
-  const created = await request(app).post('/projects/essay/reviews').send({ personality: 'trimmer' })
+  const created = await request(app).post('/projects/essay/reviews').send({ personality: 'pacing' })
   const key = `review:${created.body.review.id}`
   const dismissing = request(app)
     .post(`/projects/essay/reviews/${created.body.review.id}/status`)
@@ -433,7 +433,7 @@ test('a broadcast failure after durable dismiss does not block response or renam
       if (kind === 'launch') await launchSettlementGate
     },
   })
-  const created = await request(app).post('/projects/essay/reviews').send({ personality: 'trimmer' })
+  const created = await request(app).post('/projects/essay/reviews').send({ personality: 'pacing' })
   const key = `review:${created.body.review.id}`
   throwBroadcast = true
   let responseSettled = false
@@ -465,7 +465,7 @@ test('dismiss before child admission tombstones the attempt so it never starts l
   const fake = makeFakeRunner({ status: 'accepted' }, () => {}, { runGate })
   const app = await appWithRunner(fake.runner)
   const created = await request(app).post('/projects/essay/reviews').send({
-    reviewId: 'rev-client-a', personality: 'trimmer',
+    reviewId: 'rev-client-a', personality: 'pacing',
   })
 
   const dismissed = await request(app)
@@ -483,7 +483,7 @@ test('dismiss before child admission tombstones the attempt so it never starts l
 test('a failed cancel leaves the live review visible and reports the failure', async () => {
   const fake = makeFakeRunner({ status: 'signal-failed' })
   const app = await appWithRunner(fake.runner)
-  const created = await request(app).post('/projects/essay/reviews').send({ personality: 'trimmer' })
+  const created = await request(app).post('/projects/essay/reviews').send({ personality: 'pacing' })
   const reviewId = created.body.review.id
   const key = `review:${reviewId}`
 
@@ -504,7 +504,7 @@ test('POST /reviews/:id/run retries a failed review', async () => {
   const order: string[] = []
   const fake = makeFakeRunner({ status: 'accepted' }, () => order.push('run'))
   const app = await appWithRunner(fake.runner, () => order.push('broadcast'))
-  const created = await request(app).post('/projects/essay/reviews').send({ personality: 'trimmer' })
+  const created = await request(app).post('/projects/essay/reviews').send({ personality: 'pacing' })
   const reviewId = created.body.review.id
   const key = `review:${reviewId}`
 
@@ -541,7 +541,7 @@ test('POST /reviews/:id/run retries a failed review', async () => {
 test('concurrent distinct retry attempts admit only one child', async () => {
   const fake = makeFakeRunner()
   const app = await appWithRunner(fake.runner)
-  const created = await request(app).post('/projects/essay/reviews').send({ personality: 'trimmer' })
+  const created = await request(app).post('/projects/essay/reviews').send({ personality: 'pacing' })
   const reviewId = created.body.review.id
   const key = `review:${reviewId}`
   fake.emit(key, { type: 'error', message: 'boom' })
@@ -569,7 +569,7 @@ test('POST /reviews/:id/run on an unknown review → 404', async () => {
 test('retry no-ops (still 202) if the review is already running under its key', async () => {
   const fake = makeFakeRunner()
   const app = await appWithRunner(fake.runner)
-  const created = await request(app).post('/projects/essay/reviews').send({ personality: 'trimmer' })
+  const created = await request(app).post('/projects/essay/reviews').send({ personality: 'pacing' })
   const reviewId = created.body.review.id
   expect(fake.calls).toHaveLength(1) // the summon's own run is still active (never finished)
 
@@ -580,7 +580,7 @@ test('retry no-ops (still 202) if the review is already running under its key', 
 
 test('with no runner configured, a summoned review simply stays pending', async () => {
   const app = await appWithRunner(undefined)
-  const created = await request(app).post('/projects/essay/reviews').send({ personality: 'trimmer' })
+  const created = await request(app).post('/projects/essay/reviews').send({ personality: 'pacing' })
   expect(created.body.review.status).toBe('pending')
 
   await new Promise((r) => setTimeout(r, 50))

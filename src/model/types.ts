@@ -9,15 +9,34 @@ export type Origin = 'tana' | 'image' | 'typed' | 'transcribed' | 'reference'
  */
 export type FigureStatus = 'idea' | 'sketched' | 'final'
 
+/**
+ * The failure modes of reflective and opinion writing.
+ *
+ * Goblins reads for a different genre than an argument auditor does: a personal
+ * essay rarely fails by asserting something false, it fails by going abstract
+ * where it should be particular, by claiming a feeling it hasn't paid for, or
+ * by ending without arriving. These are the things a good reader of that genre
+ * actually marks in the margin.
+ */
 export type CommentType =
-  | 'needs-evidence'
-  | 'weak-argument'
-  | 'needs-citation'
-  | 'wants-figure'
-  | 'counterpoint'
-  | 'tighten'
+  /** Retreated to generality where a concrete particular belongs. */
+  | 'abstract'
+  /** Named the feeling instead of rendering the thing that caused it. */
+  | 'told'
+  /** A beat, turn, or conclusion the piece hasn't paid for yet. */
+  | 'unearned'
+  /** The voice slips — borrowed, performed, or someone else's register. */
+  | 'false-note'
+  /** Pacing goes soft: throat-clearing, circling, a sagging middle. */
+  | 'slack'
+  /** The best line or the real ending is buried inside a paragraph. */
+  | 'buried'
+  /** The reflection doesn't turn or arrive — nothing is at stake by the end. */
+  | 'so-what'
+  /** A cold reader loses the thread here. */
   | 'unclear'
-  | 'structure'
+  /** Says in many words what it could say in few. */
+  | 'tighten'
 
 /** One durable turn in a user ↔ agent annotation conversation. */
 export interface AnnotationMessage {

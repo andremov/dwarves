@@ -340,7 +340,7 @@ test('a stale review load cannot overwrite a newer visit to the same project', a
   // This review is newer than the response held above. Supplying an agent makes
   // it an already-claimed pass, so the in-app runner does not introduce timing.
   await request.post(`${BASE}/projects/${alphaId}/reviews`, {
-    data: { personality: 'trimmer', agent: 'claude' },
+    data: { personality: 'pacing', agent: 'claude' },
   })
 
   await page.getByTestId('project-switcher').click()
@@ -351,7 +351,7 @@ test('a stale review load cannot overwrite a newer visit to the same project', a
   await page.getByRole('menuitemradio', { name: alpha }).click()
   await currentAlphaLoaded
   await page.getByTestId('review-button').click()
-  const currentPass = page.getByTestId('review-pass-trimmer')
+  const currentPass = page.getByTestId('review-pass-pacing')
   await expect(currentPass).toHaveAttribute('data-status', 'in-progress')
 
   // The first visit's response must not be accepted merely because Alpha is
@@ -408,10 +408,10 @@ test('a stale review load cannot overwrite a newer realtime snapshot in the same
   // Creating an already-claimed pass broadcasts its complete review list over
   // the live websocket without starting the in-app review runner.
   await request.post(`${BASE}/projects/${alphaId}/reviews`, {
-    data: { personality: 'trimmer', agent: 'claude' },
+    data: { personality: 'pacing', agent: 'claude' },
   })
   await page.getByTestId('review-button').click()
-  const currentPass = page.getByTestId('review-pass-trimmer')
+  const currentPass = page.getByTestId('review-pass-pacing')
   await expect(currentPass).toHaveAttribute('data-status', 'in-progress')
 
   // Releasing the same visit's older GET used to replace the realtime state

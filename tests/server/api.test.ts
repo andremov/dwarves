@@ -502,14 +502,14 @@ test('a review creation queued before rename completes in the renamed project', 
   const [create, rename] = await mutationBeforeRename(
     dataRoot,
     () => request(app).post('/projects/essay/reviews').send({
-      personality: 'trimmer',
+      personality: 'pacing',
       agent: 'reviewer',
     }).then((response) => response),
     () => request(app).patch('/projects/essay').send({ name: 'Final' }).then((response) => response),
   )
   expect(create.status).toBe(200)
   expect(rename.status).toBe(200)
-  expect(create.body.review).toMatchObject({ personality: 'trimmer', status: 'in-progress' })
+  expect(create.body.review).toMatchObject({ personality: 'pacing', status: 'in-progress' })
   const reviews = await request(app).get('/projects/final/reviews')
   expect(reviews.status).toBe(200)
   expect(reviews.body.reviews).toContainEqual(create.body.review)
@@ -560,7 +560,7 @@ test('rename queued before review creation makes the old-id writer 404 without a
     dataRoot,
     () => request(app).patch('/projects/essay').send({ name: 'Final' }).then((response) => response),
     () => request(app).post('/projects/essay/reviews')
-      .send({ personality: 'trimmer', agent: 'reviewer' })
+      .send({ personality: 'pacing', agent: 'reviewer' })
       .then((response) => response),
   )
   expect(renameResponse.status).toBe(200)
@@ -838,9 +838,9 @@ test('unfurl cancels an image body at the deadline and keeps its asset null', as
 
 test('the allowed client dev origin gets Access-Control-Allow-Origin echoed back', async () => {
   const app = await appWithTmp()
-  const res = await request(app).get('/projects').set('Origin', 'http://localhost:5173')
+  const res = await request(app).get('/projects').set('Origin', 'http://localhost:5273')
   expect(res.status).toBe(200)
-  expect(res.headers['access-control-allow-origin']).toBe('http://localhost:5173')
+  expect(res.headers['access-control-allow-origin']).toBe('http://localhost:5273')
 })
 
 test('a request with no Origin header (supertest default) still works', async () => {

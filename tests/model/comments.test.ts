@@ -16,7 +16,7 @@ describe('comment helpers', () => {
       reviewId: null,
       summary: null, summaryOfHash: null, summaryBy: null, summaryAt: null,
     })
-    expect(makeComment('c2', 'no source', 'needs-evidence').type).toBe('needs-evidence')
+    expect(makeComment('c2', 'no source', 'abstract').type).toBe('abstract')
   })
 
   test('makeComment stamps the authoring agent id when given one', () => {
@@ -26,7 +26,7 @@ describe('comment helpers', () => {
   })
 
   test('makeComment stamps the reviewId when given one, defaulting to null', () => {
-    expect(makeComment('c1', 'no evidence', 'needs-evidence', 'claude', 'rev-1').reviewId).toBe('rev-1')
+    expect(makeComment('c1', 'no evidence', 'abstract', 'claude', 'rev-1').reviewId).toBe('rev-1')
     expect(makeComment('c2', 'thin here').reviewId).toBeNull()
   })
 
@@ -91,7 +91,7 @@ describe('comment helpers', () => {
   test('estimateCommentHeight reserves text, type-label, stack gap, and top gutter', () => {
     expect(estimateCommentHeight([
       makeComment('c1', 'short'),
-      makeComment('c2', 'typed', 'structure'),
+      makeComment('c2', 'typed', 'so-what'),
     ], 370)).toBe(107)
   })
 })

@@ -29,7 +29,7 @@ function fixedRepair(text: string): Repairer {
 beforeEach(() => setRepairer(NO_REPAIR))
 
 test('the MCP server exposes the scoped tools plus list_projects, and no text-editing tool', async () => {
-  const server = createMcpServer('http://localhost:5199')
+  const server = createMcpServer('http://localhost:5299')
   const [clientT, serverT] = InMemoryTransport.createLinkedPair()
   await server.connect(serverT)
   const client = new Client({ name: 'test', version: '0.0.0' })

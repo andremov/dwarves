@@ -271,7 +271,7 @@ test('snapshotToSummarizableComments exposes one entry per comment, keyed by car
           w: 240, h: 120, kind: 'prose', noteKind: null, origin: null, text: 'x', mergedInto: null,
           comments: [
             { id: 'cmt-1', type: null, text: 'first comment', resolved: false, author: 'claude', summary: null, summaryOfHash: null, summaryBy: null, summaryAt: null },
-            { id: 'cmt-2', type: 'weak-argument', text: 'second comment', resolved: false, author: 'claude', summary: 'a gist', summaryOfHash: 'abc', summaryBy: 'ollama/llama3.2', summaryAt: 'T' },
+            { id: 'cmt-2', type: 'told', text: 'second comment', resolved: false, author: 'claude', summary: 'a gist', summaryOfHash: 'abc', summaryBy: 'ollama/llama3.2', summaryAt: 'T' },
           ],
         },
       },

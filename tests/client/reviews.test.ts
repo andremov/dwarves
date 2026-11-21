@@ -4,7 +4,7 @@ import { dismissReview, retryReview, summonReview } from '../../src/client/revie
 
 const review = (overrides: Partial<Review> = {}): Review => ({
   id: 'rev-client-a',
-  personality: 'trimmer',
+  personality: 'pacing',
   status: 'pending',
   focus: null,
   requestedAt: '2026-07-14T12:00:00.000Z',
@@ -32,7 +32,7 @@ test('summon retries an ambiguous response with one stable review id', async () 
   })
   vi.stubGlobal('fetch', fetchMock)
 
-  const result = summonReview('essay', 'trimmer', null)
+  const result = summonReview('essay', 'pacing', null)
   void result.catch(() => {})
   await vi.waitFor(() => expect(bodies).toHaveLength(1))
   await vi.advanceTimersByTimeAsync(250)
@@ -115,7 +115,7 @@ test('summon rejects partial and wrong-id 2xx bodies as ambiguous', async () => 
     return new Response(JSON.stringify({ review: review({ id: body.reviewId }) }), { status: 200 })
   }))
 
-  const result = summonReview('essay', 'trimmer', null)
+  const result = summonReview('essay', 'pacing', null)
   await vi.waitFor(() => expect(bodies).toHaveLength(1))
   await vi.advanceTimersByTimeAsync(750)
 

@@ -1,7 +1,7 @@
 import type { Reference } from '../model/types'
 import { blankReference } from '../model/references'
 
-const BASE = (import.meta as any).env?.VITE_SERVER_URL ?? 'http://localhost:5199'
+const BASE = (import.meta as any).env?.VITE_SERVER_URL ?? 'http://localhost:5299'
 
 /**
  * Ask the server to unfurl a url into a Reference (fetching its metadata +

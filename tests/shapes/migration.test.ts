@@ -121,7 +121,7 @@ test('AddCommentReviewId migration adds reviewId: null to every existing comment
     w: 240, h: 120, kind: 'prose', noteKind: null, origin: null, text: 'x',
     comments: [
       { id: 'c1', type: null, text: 'a note', resolved: false, author: 'claude' },
-      { id: 'c2', type: 'needs-evidence', text: 'another', resolved: true, author: 'codex' },
+      { id: 'c2', type: 'abstract', text: 'another', resolved: true, author: 'codex' },
     ],
     mergedInto: null, assetId: null, reference: null, authoredBy: null,
     draftExcluded: false, summary: null, summaryOfHash: null, summaryBy: null, summaryAt: null,
@@ -130,7 +130,7 @@ test('AddCommentReviewId migration adds reviewId: null to every existing comment
   addCommentReviewIdUp(props)
   expect(props.comments).toEqual([
     { id: 'c1', type: null, text: 'a note', resolved: false, author: 'claude', reviewId: null },
-    { id: 'c2', type: 'needs-evidence', text: 'another', resolved: true, author: 'codex', reviewId: null },
+    { id: 'c2', type: 'abstract', text: 'another', resolved: true, author: 'codex', reviewId: null },
   ])
 })
 
@@ -160,7 +160,7 @@ test('AddCommentMessages migration preserves threaded snapshots and initializes 
 test('feedback pin migration compacts legacy geometry and round-trips it', () => {
   const props: Record<string, unknown> = {
     w: 370, h: 96, text: 'The bridge is missing.', authoredBy: 'claude',
-    type: 'structure', reviewId: null, reviewer: null, resolved: false,
+    type: 'so-what', reviewId: null, reviewer: null, resolved: false,
   }
 
   compactFeedbackPinUp(props)
@@ -236,7 +236,7 @@ test('AddCommentSummary migration adds the four null summary fields to every exi
     w: 240, h: 120, kind: 'prose', noteKind: null, origin: null, text: 'x',
     comments: [
       { id: 'c1', type: null, text: 'a', resolved: false, author: 'claude' },
-      { id: 'c2', type: 'weak-argument', text: 'b', resolved: true, author: 'claude' },
+      { id: 'c2', type: 'told', text: 'b', resolved: true, author: 'claude' },
     ],
     mergedInto: null, assetId: null, reference: null, authoredBy: null,
     draftExcluded: false, figureTitle: '', figureStatus: null,
