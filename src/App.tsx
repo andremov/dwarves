@@ -267,7 +267,7 @@ export default function App() {
       }
       return list
     } catch (err) {
-      console.error('Elves: failed to load projects', err)
+      console.error('Dwarves: failed to load projects', err)
       setProjectListError(true)
       return null
     }
@@ -280,7 +280,7 @@ export default function App() {
     const mount = canvasMountRef.current
     if (!mount) return
     void requestOwnedRemoteSync(mount, mount.project.id, false).catch((err) =>
-      console.error('Elves: resync after reconnect failed', err),
+      console.error('Dwarves: resync after reconnect failed', err),
     )
   }
 
@@ -292,7 +292,7 @@ export default function App() {
         (projectId, cs) => {
           const glow = cs.ops.some((op) => !isSummaryOp(op))
           void requestOwnedRemoteSync(canvasMountRef.current, projectId, glow).catch((err) =>
-            console.error('Elves: realtime canvas sync failed', err),
+            console.error('Dwarves: realtime canvas sync failed', err),
           )
         },
         (projectId, presence) => {
@@ -336,7 +336,7 @@ export default function App() {
           setReviews(list)
         }
       })
-      .catch((err) => console.error('Elves: failed to load reviews', err))
+      .catch((err) => console.error('Dwarves: failed to load reviews', err))
     return () => {
       if (reviewVisitRef.current === visit) reviewVisitRef.current++
     }
@@ -373,7 +373,7 @@ export default function App() {
 
   const refreshReviewsAfterMutation = (pid: string, visit: number) =>
     refreshReviewsForVisit(pid, visit).catch((err) =>
-      console.error('Elves: failed to refresh reviews', err),
+      console.error('Dwarves: failed to refresh reviews', err),
     )
 
   const handleSummonReview = (personality: PersonalityId, focus: string | null) => {
@@ -392,7 +392,7 @@ export default function App() {
         return refreshReviewsAfterMutation(pid, visit)
       })
       .catch((err) => {
-        if (!controller.signal.aborted) console.error('Elves: failed to summon review', err)
+        if (!controller.signal.aborted) console.error('Dwarves: failed to summon review', err)
       })
       .finally(() => {
         reviewMutationControllersRef.current.delete(controller)
@@ -414,7 +414,7 @@ export default function App() {
         return refreshReviewsAfterMutation(pid, visit)
       })
       .catch((err) => {
-        if (!controller.signal.aborted) console.error('Elves: failed to dismiss review', err)
+        if (!controller.signal.aborted) console.error('Dwarves: failed to dismiss review', err)
       })
       .finally(() => {
         reviewMutationControllersRef.current.delete(controller)
@@ -438,7 +438,7 @@ export default function App() {
         return refreshReviewsAfterMutation(pid, visit)
       })
       .catch((err) => {
-        if (!controller.signal.aborted) console.error('Elves: failed to retry review', err)
+        if (!controller.signal.aborted) console.error('Dwarves: failed to retry review', err)
       })
       .finally(() => {
         reviewMutationControllersRef.current.delete(controller)
@@ -761,7 +761,7 @@ export default function App() {
     ed.registerExternalContentHandler('url', async ({ url, point }) => {
       if (!mount.initialized) return
       await addReferenceFromUrl(mount, url, point).catch((err) =>
-        console.error('Elves: dropped link command failed', err),
+        console.error('Dwarves: dropped link command failed', err),
       )
     })
   }
@@ -782,7 +782,7 @@ export default function App() {
       .catch((err) => {
         if (canvasMountRef.current !== mount) return
         setCanvasWriteStatus('error')
-        console.error('Elves: canvas coordinator initialization failed', err)
+        console.error('Dwarves: canvas coordinator initialization failed', err)
       })
   }
 
@@ -910,7 +910,7 @@ export default function App() {
       await addReferenceFromUrl(mount, url)
       if (canvasMountRef.current === mount) setLinkPromptOpen(false)
     } catch (err) {
-      console.error('Elves: failed to add link', err)
+      console.error('Dwarves: failed to add link', err)
     }
   }
 
@@ -942,7 +942,7 @@ export default function App() {
         await flushCanvasMountForSwitch(mount)
       } catch (err) {
         mount.openCommands()
-        console.error('Elves: project switch blocked by canvas save failure', err)
+        console.error('Dwarves: project switch blocked by canvas save failure', err)
         return
       }
       mount.dispose()
@@ -986,7 +986,7 @@ export default function App() {
       }
       await switchProject(proj.id)
     } catch (err) {
-      console.error('Elves: failed to create project', err)
+      console.error('Dwarves: failed to create project', err)
     }
   }
 
@@ -1021,7 +1021,7 @@ export default function App() {
           }
         })
         .catch((err) => {
-          console.error('Elves: failed to refresh projects after rename', err)
+          console.error('Dwarves: failed to refresh projects after rename', err)
           setProjectListError(true)
         })
       const reviewVisit = reviewVisitRef.current
@@ -1030,9 +1030,9 @@ export default function App() {
           if (reviewVisitRef.current === reviewVisit && canvasMountRef.current === mount &&
             mount.writeCoordinator.ownsProject(updated.id)) setReviews(list)
         })
-        .catch((err) => console.error('Elves: failed to refresh reviews after rename', err))
+        .catch((err) => console.error('Dwarves: failed to refresh reviews after rename', err))
     } catch (err) {
-      console.error('Elves: failed to rename project', err)
+      console.error('Dwarves: failed to rename project', err)
     } finally {
       if (mount.writeCoordinator.ownsProject(mount.project.id)) mount.openCommands()
     }
@@ -1054,14 +1054,14 @@ export default function App() {
     const mount = canvasMountRef.current
     if (!mount) return
     void mount.writeCoordinator.resolveRecovery(decision)
-      .catch((err) => console.error('Elves: failed to resolve canvas recovery', err))
+      .catch((err) => console.error('Dwarves: failed to resolve canvas recovery', err))
   }
 
   const retryCanvasSave = () => {
     const mount = canvasMountRef.current
     if (!mount) return
     void mount.writeCoordinator.retryNow()
-      .catch((err) => console.error('Elves: canvas save retry failed', err))
+      .catch((err) => console.error('Dwarves: canvas save retry failed', err))
   }
 
   // A failed read is not an empty project store. Keep creation unavailable
@@ -1072,7 +1072,7 @@ export default function App() {
         <div className="elves-empty" data-testid="project-load-error">
           <h1 className="elves-empty__title">Couldn’t load projects</h1>
           <p className="elves-empty__body">
-            Elves can’t reach the project API. Check that the server is running, then try again.
+            Dwarves can’t reach the project API. Check that the server is running, then try again.
           </p>
           <button
             className="elves-empty__button"
@@ -1298,7 +1298,7 @@ export default function App() {
                   if (file && mount) {
                     void addCanvasImageFiles(mount, [file]).catch((err) => {
                       if (!(err instanceof AppCanvasMountStaleError)) {
-                        console.error('Elves: failed to add image', err)
+                        console.error('Dwarves: failed to add image', err)
                       }
                     })
                   }

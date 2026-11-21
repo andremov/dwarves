@@ -17,7 +17,7 @@ import { DEFAULT_OLLAMA_HOST, REPAIR_MODEL, TransportBreaker, ollamaGenerate } f
  * model on this machine does that for nothing.
  *
  * So repair comes first and rejection is the fallback. Ollama is already how
- * Elves writes card gists (server/summarize/ollama.ts), and this follows that
+ * Dwarves writes card gists (server/summarize/ollama.ts), and this follows that
  * module's contract exactly: any failure returns null, and the caller carries
  * on as if the repairer did not exist. Ollama not running, model not pulled,
  * request timed out, reply unusable — every one of those lands on the old

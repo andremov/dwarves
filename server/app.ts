@@ -60,7 +60,7 @@ import {
 import { changeSetDigest, validateChangeSetBounds } from './changeSetIdentity'
 import { admitLegacyChangeSet, admitTokenizedChangeSet } from './changeSetAdmission'
 
-const UNFURL_UA = 'ElvesBot/0.1 (+local-first writing studio; reference unfurl)'
+const UNFURL_UA = 'DwarvesBot/0.1 (+local-first writing studio; reference unfurl)'
 const FETCH_TIMEOUT_MS = 8000
 const MAX_HTML_BYTES = 2_000_000
 const MAX_IMAGE_BYTES = 5_000_000

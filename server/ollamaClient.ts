@@ -1,7 +1,7 @@
 /**
  * The one place that knows how to ask a local model for a completion.
  *
- * Elves talks to Ollama from three places now — card gists
+ * Dwarves talks to Ollama from three places now — card gists
  * (server/summarize/ollama.ts), repairing an agent's note before it lands on
  * the canvas (mcp/repair.ts), and repairing an agent's chat reply before it is
  * saved (server/replyStyle.ts). Each owns its own prompt, timeout and

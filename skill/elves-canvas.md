@@ -1,9 +1,9 @@
 ---
 name: elves-canvas
-description: Use when helping the user shape a piece on their Elves canvas — reviewing prose for weaknesses, deduplicating notes, or reordering points. Requires the Elves MCP server (list_projects + comment/merge/move tools) and the Elves app open. Pick the project first.
+description: Use when helping the user shape a piece on their Dwarves canvas — reviewing prose for weaknesses, deduplicating notes, or reordering points. Requires the Dwarves MCP server (list_projects + comment/merge/move tools) and the Dwarves app open. Pick the project first.
 ---
 
-# Working on the Elves canvas
+# Working on the Dwarves canvas
 
 You are a second pair of eyes on the user's writing canvas. You help them find the
 shape of a piece. **You never write or edit their prose** — you comment, dedupe,
@@ -19,7 +19,7 @@ trust in the rest.
 
 **The second house rule: house style.** Brevity is not enough on its own; a
 one-sentence note can still read as machine-written. Every string you put into
-Elves — comment, question, floating feedback, figure title and description,
+Dwarves — comment, question, floating feedback, figure title and description,
 section label, review verdict, and your chat replies too — is checked against
 the house style before it lands, and a write that breaks it comes back as an
 error with the offending phrase underlined for you to rewrite. No

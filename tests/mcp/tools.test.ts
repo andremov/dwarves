@@ -39,7 +39,7 @@ import type { Repairer } from '../../mcp/repair'
 let servers: http.Server[] = []
 let dirs: string[] = []
 type RecordedRequest = { method: string | undefined; url: string | undefined }
-async function liveElves(): Promise<{ base: string; requests: RecordedRequest[] }> {
+async function liveDwarves(): Promise<{ base: string; requests: RecordedRequest[] }> {
   const dataRoot = await fs.mkdtemp(join(tmpdir(), 'elves-mcp-'))
   dirs.push(dataRoot)
   await createProject(dataRoot, 'Essay', '2026-07-02T10:00:00.000Z') // id: 'essay'
@@ -107,12 +107,12 @@ test('the configured agent id (ELVES_AGENT) becomes the change-set author', () =
 })
 
 test('listProjectsTool returns the project id and name', async () => {
-  const { base } = await liveElves()
+  const { base } = await liveDwarves()
   expect(await listProjectsTool(base)).toEqual([{ id: 'essay', name: 'Essay' }])
 })
 
 test('addCommentTool posts a change-set the server broadcasts tagged with the project', async () => {
-  const { base } = await liveElves()
+  const { base } = await liveDwarves()
   await seedCard(base, 'shape:a')
   const ws = new WebSocket(base.replace('http', 'ws') + '/ws')
   const received = new Promise<any>((res) => ws.on('message', (d) => res(JSON.parse(d.toString()))))
@@ -130,7 +130,7 @@ test('addCommentTool posts a change-set the server broadcasts tagged with the pr
 })
 
 test('addCommentTool posts comment.reviewId when given one, tagging the comment to a review pass', async () => {
-  const { base } = await liveElves()
+  const { base } = await liveDwarves()
   await seedCard(base, 'shape:a')
   const ws = new WebSocket(base.replace('http', 'ws') + '/ws')
   const received = new Promise<any>((res) => ws.on('message', (d) => res(JSON.parse(d.toString()))))
@@ -162,7 +162,7 @@ async function seedPendingReview(base: string, personality: string, focus: strin
 }
 
 test('startReviewTool ad-hoc: posts personality+agent and returns instructions with the personality brief and reviewId', async () => {
-  const { base } = await liveElves()
+  const { base } = await liveDwarves()
   const started = await startReviewTool(base, 'essay', { personality: 'pacing' })
 
   expect(started.personality).toBe('pacing')
@@ -178,7 +178,7 @@ test('startReviewTool ad-hoc: posts personality+agent and returns instructions w
 })
 
 test('startReviewTool with reviewId claims a pending review, then re-returns the brief without re-claiming', async () => {
-  const { base } = await liveElves()
+  const { base } = await liveDwarves()
   const reviewId = await seedPendingReview(base, 'stakes', 'the ending')
 
   const first = await startReviewTool(base, 'essay', { reviewId })
@@ -204,7 +204,7 @@ test('startReviewTool with reviewId claims a pending review, then re-returns the
 })
 
 test('startReviewTool with reviewId re-claims a FAILED review (the retry path) and clears its error', async () => {
-  const { base } = await liveElves()
+  const { base } = await liveDwarves()
   const reviewId = await seedPendingReview(base, 'character')
   // Simulate an in-app run that died: fail the pending pass directly against
   // the same status endpoint the server's launchReviewRun completion handler
@@ -232,12 +232,12 @@ test('startReviewTool with reviewId re-claims a FAILED review (the retry path) a
 })
 
 test('startReviewTool without a reviewId or personality rejects with a helpful error', async () => {
-  const { base } = await liveElves()
+  const { base } = await liveDwarves()
   await expect(startReviewTool(base, 'essay', {})).rejects.toThrow(/reviewId.*personality|personality.*reviewId/)
 })
 
 test('completeReviewTool posts status done with the given verdict and stamps commentCount', async () => {
-  const { base } = await liveElves()
+  const { base } = await liveDwarves()
   const started = await startReviewTool(base, 'essay', { personality: 'character' })
 
   const review = await completeReviewTool(base, 'essay', { reviewId: started.reviewId, verdict: 'the receipts check out' })
@@ -249,7 +249,7 @@ test('completeReviewTool posts status done with the given verdict and stamps com
 })
 
 test('createNoteCardTool posts a create_note_card change-set', async () => {
-  const { base } = await liveElves()
+  const { base } = await liveDwarves()
   await seedEmptyCanvas(base)
   const ws = new WebSocket(base.replace('http', 'ws') + '/ws')
   const received = new Promise<any>((res) => ws.on('message', (d) => res(JSON.parse(d.toString()))))
@@ -264,7 +264,7 @@ test('createNoteCardTool posts a create_note_card change-set', async () => {
 })
 
 test('floating feedback can be created and explicitly resolved through the shared tools', async () => {
-  const { base } = await liveElves()
+  const { base } = await liveDwarves()
   await seedEmptyCanvas(base)
 
   await createFeedbackTool(base, 'essay', {
@@ -293,7 +293,7 @@ test('floating feedback can be created and explicitly resolved through the share
 // Every canvas mutation tool delegates to postChangeSet; this create-only call
 // proves that shared boundary because only protocol 2 can queue without a canvas.
 test('a tool mutation gets a token and queues through the shared protocol-2 client', async () => {
-  const { base, requests } = await liveElves()
+  const { base, requests } = await liveDwarves()
 
   const result = await createNoteCardTool(base, 'essay', {
     text: 'queued before the canvas opens', x: 5, y: 6,
@@ -322,7 +322,7 @@ test('a tool mutation gets a token and queues through the shared protocol-2 clie
 })
 
 test('createFigureCardTool posts a create_figure_card change-set', async () => {
-  const { base } = await liveElves()
+  const { base } = await liveDwarves()
   await seedEmptyCanvas(base)
   const ws = new WebSocket(base.replace('http', 'ws') + '/ws')
   const received = new Promise<any>((res) => ws.on('message', (d) => res(JSON.parse(d.toString()))))
@@ -339,7 +339,7 @@ test('createFigureCardTool posts a create_figure_card change-set', async () => {
 })
 
 test('readMapTool reads the cheap map (gist, no full text) for the project', async () => {
-  const { base } = await liveElves()
+  const { base } = await liveDwarves()
   await seedCard(base, 'shape:a')
   const map = await readMapTool(base, 'essay')
   expect(map).toEqual({
@@ -352,7 +352,7 @@ test('readMapTool reads the cheap map (gist, no full text) for the project', asy
 })
 
 test('readCardsTool reads full digests for the requested card ids', async () => {
-  const { base } = await liveElves()
+  const { base } = await liveDwarves()
   await seedCard(base, 'shape:a')
   const cards = await readCardsTool(base, 'essay', ['shape:a'])
   expect(cards).toEqual([
@@ -361,14 +361,14 @@ test('readCardsTool reads full digests for the requested card ids', async () => 
 })
 
 test('readDraftTool compiles the canvas into ordered narrative blocks', async () => {
-  const { base } = await liveElves()
+  const { base } = await liveDwarves()
   await seedCard(base, 'shape:a') // one prose card, no section → one opening block
   const blocks = await readDraftTool(base, 'essay')
   expect(blocks).toEqual([{ section: null, items: [{ type: 'prose', id: 'shape:a', text: 'hi' }] }])
 })
 
 test('createReferenceTool unfurls a url and posts a create_reference change-set, Claude fields winning', async () => {
-  const { base } = await liveElves()
+  const { base } = await liveDwarves()
   await seedEmptyCanvas(base)
   const ws = new WebSocket(base.replace('http', 'ws') + '/ws')
   const received = new Promise<any>((res) => ws.on('message', (d) => res(JSON.parse(d.toString()))))
@@ -398,12 +398,12 @@ test('createReferenceTool unfurls a url and posts a create_reference change-set,
 })
 
 test('a tool call for an unknown project rejects with a helpful error', async () => {
-  const { base } = await liveElves()
+  const { base } = await liveDwarves()
   await expect(readMapTool(base, 'ghost')).rejects.toThrow(/unknown project/)
 })
 
 test('createSectionTool posts a create_section change-set', async () => {
-  const { base } = await liveElves()
+  const { base } = await liveDwarves()
   await seedEmptyCanvas(base)
   const ws = new WebSocket(base.replace('http', 'ws') + '/ws')
   const received = new Promise<any>((res) => ws.on('message', (d) => res(JSON.parse(d.toString()))))
@@ -430,7 +430,7 @@ async function seedSection(base: string, id: string) {
 }
 
 test('moveSectionsTool posts a move_sections change-set', async () => {
-  const { base } = await liveElves()
+  const { base } = await liveDwarves()
   await seedSection(base, 'shape:s')
   const ws = new WebSocket(base.replace('http', 'ws') + '/ws')
   const received = new Promise<any>((res) => ws.on('message', (d) => res(JSON.parse(d.toString()))))
@@ -444,7 +444,7 @@ test('moveSectionsTool posts a move_sections change-set', async () => {
 })
 
 test('editSectionTextTool posts an edit_section_text change-set', async () => {
-  const { base } = await liveElves()
+  const { base } = await liveDwarves()
   await seedSection(base, 'shape:s')
   const ws = new WebSocket(base.replace('http', 'ws') + '/ws')
   const received = new Promise<any>((res) => ws.on('message', (d) => res(JSON.parse(d.toString()))))
@@ -458,7 +458,7 @@ test('editSectionTextTool posts an edit_section_text change-set', async () => {
 })
 
 // A server wired with a selection store, so read_selection has state to read.
-async function liveElvesWithSelection(): Promise<{ base: string }> {
+async function liveDwarvesWithSelection(): Promise<{ base: string }> {
   const dataRoot = await fs.mkdtemp(join(tmpdir(), 'elves-mcp-sel-'))
   dirs.push(dataRoot)
   await createProject(dataRoot, 'Essay', '2026-07-02T10:00:00.000Z') // id: 'essay'
@@ -472,7 +472,7 @@ async function liveElvesWithSelection(): Promise<{ base: string }> {
 }
 
 test('readSelectionTool returns the enriched selection (with project) reported by the browser', async () => {
-  const { base } = await liveElvesWithSelection()
+  const { base } = await liveDwarvesWithSelection()
   await seedSection(base, 'shape:s') // seeds a canvas containing section shape:s
   await fetch(`${base}/projects/essay/selection`, {
     method: 'POST',
@@ -487,7 +487,7 @@ test('readSelectionTool returns the enriched selection (with project) reported b
 })
 
 test('readSelectionTool returns an empty selection when nothing is selected', async () => {
-  const { base } = await liveElvesWithSelection()
+  const { base } = await liveDwarvesWithSelection()
   expect(await readSelectionTool(base)).toEqual({ selection: [] })
 })
 
@@ -500,7 +500,7 @@ test('readSelectionTool returns an empty selection when nothing is selected', as
 // that: a bug that repaired a note and then wrote the original would pass every
 // one of those tests. These go through the real server and read the card back.
 //
-// They live in this file on purpose. They need a live Elves and an MCP client,
+// They live in this file on purpose. They need a live Dwarves and an MCP client,
 // and the harness for both is already here. A separate file would add another
 // vitest worker and another HTTP server, which turned out to be enough extra
 // parallel load to tip tests/server/changeset.test.ts's 5s timeouts into
@@ -520,14 +520,14 @@ async function mcpClient(base: string): Promise<Client> {
   return client
 }
 
-// Three cases, not six. Each liveElves() is a real HTTP server and a real temp
+// Three cases, not six. Each liveDwarves() is a real HTTP server and a real temp
 // dir, and tests/server/changeset.test.ts runs 5s timeouts against the same
 // machine — it flakes roughly one run in five on its own, and six more servers
 // here took that to two in five. Grouping the assertions keeps the added load
 // where it was.
 
 test('a repaired note lands repaired, and the agent is told it was changed', async () => {
-  const { base } = await liveElves()
+  const { base } = await liveDwarves()
   await seedCard(base, 'shape:c1')
   setRepairer(fixedRepair('The 73% figure has no source.'))
   const client = await mcpClient(base)
@@ -553,7 +553,7 @@ test('a repaired note lands repaired, and the agent is told it was changed', asy
 })
 
 test('a clean note is untouched, and a note that cannot be repaired writes nothing', async () => {
-  const { base } = await liveElves()
+  const { base } = await liveDwarves()
   await seedCard(base, 'shape:c1')
   const client = await mcpClient(base)
 
@@ -582,7 +582,7 @@ test('a clean note is untouched, and a note that cannot be repaired writes nothi
 })
 
 test('repairs land on questions and figure titles too, leaving clean fields alone', async () => {
-  const { base } = await liveElves()
+  const { base } = await liveDwarves()
   await seedEmptyCanvas(base)
   const client = await mcpClient(base)
 

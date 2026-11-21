@@ -1,9 +1,14 @@
 {
   "mcpServers": {
-    "elves": {
+    "dwarves": {
       "command": "npx",
-      "args": ["tsx", "mcp/index.ts"],
-      "env": { "ELVES_URL": "http://localhost:5199" }
+      "args": [
+        "tsx",
+        "mcp/index.ts"
+      ],
+      "env": {
+        "ELVES_URL": "http://localhost:5399"
+      }
     }
   }
 }

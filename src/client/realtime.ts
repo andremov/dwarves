@@ -101,12 +101,12 @@ export function connectRealtime(
         else if (msg.presence) onPresence?.(msg.projectId, msg.presence)
         else if (msg.reviews) onReviews?.(msg.projectId, msg.reviews)
       } catch (err) {
-        console.error('Elves: bad realtime message', err)
+        console.error('Dwarves: bad realtime message', err)
       }
     }
     socket.onerror = (err) => {
       if (!isActive()) return
-      console.error('Elves: realtime socket error', err)
+      console.error('Dwarves: realtime socket error', err)
     }
     socket.onclose = () => {
       if (!isActive()) return

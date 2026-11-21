@@ -1,6 +1,6 @@
-// Syncthing ignore file for the Elves data folder.
+// Syncthing ignore file for the Dwarves data folder.
 // Copy this to the ROOT of your synced data folder as `.stignore`
-// (e.g. ~/Elves/.stignore) on each machine.
+// (e.g. ~/Dwarves/.stignore) on each machine.
 
 // The server writes atomically via a unique temp file it renames into place.
 // Those temps are gone in milliseconds — telling Syncthing to ignore them

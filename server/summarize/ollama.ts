@@ -1,7 +1,7 @@
 import { Summarizer, SUMMARY_PROMPT, cleanSummary } from './summarizer'
 
 /**
- * Local-first summarizer via Ollama (https://ollama.com). Keeps Elves offline
+ * Local-first summarizer via Ollama (https://ollama.com). Keeps Dwarves offline
  * and free: no key, no data leaving the machine. If Ollama isn't running or the
  * model isn't pulled, every call returns null and the app degrades to mechanical
  * gists — the feature is additive, never load-bearing.

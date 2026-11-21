@@ -1,5 +1,5 @@
 /**
- * House style — the one rule set governing every string an agent writes into Elves.
+ * House style — the one rule set governing every string an agent writes into Dwarves.
  *
  * Everything an agent leaves on the canvas is read in the margin of someone's
  * draft: a comment, a question, a floating note, a figure title, a section
@@ -186,7 +186,7 @@ function echoFinder(text: string): StyleSpan[] {
 // ---------------------------------------------------------------------------
 
 export const RULES: StyleRule[] = [
-  // --- Added for Elves: the tells that ruin a margin note specifically ------
+  // --- Added for Dwarves: the tells that ruin a margin note specifically ------
   {
     id: 'preamble',
     why: 'Throat-clearing before the note. Delete the run-up and start at the thing itself.',

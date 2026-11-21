@@ -80,7 +80,7 @@ export function useImageInsertion(
         point ? { x: point.x, y: point.y } : undefined,
       ).catch((error) => {
         if (!(error instanceof AppCanvasMountStaleError)) {
-          console.error('Elves: dropped or pasted image command failed', error)
+          console.error('Dwarves: dropped or pasted image command failed', error)
         }
       })
     })

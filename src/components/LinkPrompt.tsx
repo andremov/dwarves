@@ -123,7 +123,7 @@ export function LinkPrompt({ open, onCancel, onSubmit }: Props) {
           Add a reference
         </h2>
         <p className="elves-linkprompt__hint">
-          Paste a link and Elves will pull in its title and details.
+          Paste a link and Dwarves will pull in its title and details.
         </p>
         <input
           ref={inputRef}

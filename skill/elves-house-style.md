@@ -1,9 +1,9 @@
 ---
 name: elves-house-style
-description: Use when writing any text that will appear inside the Elves app — a comment, question, floating feedback note, figure title or description, section label, review verdict, or a chat reply in the agent box or an annotation thread. Strips the phrases and structures that make writing read as machine-generated. Enforced by the server, which rejects a write that breaks these rules.
+description: Use when writing any text that will appear inside the Dwarves app — a comment, question, floating feedback note, figure title or description, section label, review verdict, or a chat reply in the agent box or an annotation thread. Strips the phrases and structures that make writing read as machine-generated. Enforced by the server, which rejects a write that breaks these rules.
 ---
 
-# Elves house style
+# Dwarves house style
 
 Everything you write lands in the margin of someone's draft. A margin note is
 read in one glance and trusted or ignored on the spot, so the failure that
@@ -12,7 +12,7 @@ noting that this claim plays a crucial role in the argument"* costs the reader a
 second and gives back nothing. *"The 73% figure has no source"* costs nothing
 and gives back the whole note.
 
-**These rules are enforced, not suggested.** The Elves MCP server runs every
+**These rules are enforced, not suggested.** The Dwarves MCP server runs every
 agent-authored string through `lintProse` (`src/model/houseStyle.ts`) before it
 touches the canvas, in two tiers.
 

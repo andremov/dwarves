@@ -154,7 +154,7 @@ export function isFigureCard(p: { kind: CardKind }): boolean {
 }
 
 /**
- * Elves' core rule, as testable code. The one card the user's OWN DRAFT lives in
+ * Dwarves' core rule, as testable code. The one card the user's OWN DRAFT lives in
  * — a prose card — is an agent's to organize, comment on, and question, but never
  * to write or edit. Everything else on the canvas is working material an agent
  * helps maintain: a note's body, a reference's annotation, a figure's

@@ -9,10 +9,10 @@ async function main() {
   const dataRoot = option('--data-root')
   if (!dataRoot) throw new Error('Usage: npm run data:recover -- --data-root <path> --force')
   const result = await recoverDataRootOwnership(dataRoot, { force: process.argv.includes('--force') })
-  console.log(`Recovered Elves data-root ownership for ${result.canonicalRoot}. Removed ${result.markerPath}.`)
+  console.log(`Recovered Dwarves data-root ownership for ${result.canonicalRoot}. Removed ${result.markerPath}.`)
 }
 
 main().catch((error) => {
-  console.error('Elves data-root recovery failed:', error instanceof Error ? error.message : error)
+  console.error('Dwarves data-root recovery failed:', error instanceof Error ? error.message : error)
   process.exit(1)
 })

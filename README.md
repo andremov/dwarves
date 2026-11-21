@@ -1,4 +1,6 @@
-# Elves
+# Dwarves
+
+> **Based on [Elves](https://github.com/maggieappleton/elves) by [Maggie Appleton](https://maggieappleton.com).** Dwarves is a fork that keeps Elves' canvas, agents and "agents never write your prose" rule, and changes what the agents read for. It's tuned for fiction. A story rarely fails by asserting something false; it fails by summarizing what should be dramatized, by giving its people nothing to want or lose, or by stalling the scene to explain the world. Dwarves' comment types and reviewers read for exactly those failures.
 
 A local-first, canvas-based writing studio for taking a piece from scattered notes to a shaped set of your-own-voice points. You think spatially on an infinite canvas of cards; the tool keeps everything on your machine in local files you own.
 
@@ -18,13 +20,13 @@ It's a writing app where **agents collaborate with you but never write for you.*
 
 **Agent presence — see where an agent is working.** As an agent works the canvas through the MCP, the cards it touches glow in its accent so you always know where its attention is. **Looking** (when it reads specific cards) is a calm, steady halo that lingers while it's active and fades once it goes idle; **doing** (a comment, merge, move, or a freshly-created card) is a brighter pulse that fades over ~10 seconds, drawing your eye to what just changed. Reading the whole-board map shows nothing (it's a scan, not a focus), and the glow is purely ephemeral — never saved, never in undo.
 
-**Section headers.** Big thematic labels that float above a cluster of cards so the shape of the piece reads at a glance when you zoom out. You or an agent can write and rename them (an agent's show in its accent).
+**Section headers.** One-line thematic labels above a cluster of cards so the shape of the piece reads at a glance when you zoom out. You or an agent can write and rename them (an agent's show in its accent). Each section owns a band of the canvas, from its left edge to the next section's, drawn as a tinted column so you can see which cards belong to it.
 
-**Comments.** An agent flags weak spots in your prose — `needs-evidence`, `weak-argument`, `needs-citation`, `wants-figure`, `counterpoint`, `tighten`, `unclear`, `structure`, or a freeform note — each individually resolvable. Always agent-authored; it comments on your prose, never rewrites it.
+**Comments.** An agent flags weak spots in your prose — `telling`, `flat`, `stakes`, `dialogue`, `pov`, `info-dump`, `continuity`, `drag`, `unclear`, `tighten`, or a freeform note — each individually resolvable. Always agent-authored; it comments on your prose, never rewrites it.
 
 **Floating feedback.** When a finding concerns a relationship, cluster, missing bridge, or the canvas as a whole rather than one card, an agent leaves a movable feedback card nearby. You can move or resolve it, but its agent-authored words stay immutable. Resolved items leave the working canvas and collect in one shared history above the bottom-right Review home, where you can restore them at their original positions.
 
-**Review passes.** Summon one of five reviewer personalities — Devil's Advocate, The Fact-Checker, The Trimmer, The First Reader, The Architect — for a bounded, in-character editorial pass: each reads the whole scoped canvas for one thing only, works within a shared attached/floating annotation budget, and ends with a short verdict. Click **Review** at the bottom-right to launch one with an optional focus note, or ask your agent in chat ("play devil's advocate on my canvas"). A review can attach feedback to one card or float it beside a relationship or gap.
+**Review passes.** Summon one of seven reviewers — The Scene Dwarf, The Character Dwarf, The Dialogue Dwarf, The Stakes Dwarf, The Continuity Dwarf, The Pacing Dwarf, The First Reader — for a bounded, in-character editorial pass: each reads the whole scoped canvas for one thing only, works within a shared attached/floating annotation budget, and ends with a short verdict. Click **Review** at the bottom-right to launch one with an optional focus note, or ask your agent in chat ("where does the tension drop?"). A review can attach feedback to one card or float it beside a relationship or gap.
 
 **Merge duplicates.** Near-identical note cards collapse under one representative (the rest hidden but recoverable) with an "N merged" badge.
 
@@ -34,7 +36,7 @@ It's a writing app where **agents collaborate with you but never write for you.*
 
 **References.** Papers, articles, books, software, tweets, videos, links — paste a url and the server **unfurls** it into a rich, clickable **reference card** with a type-adaptive face (favicon + hero cached locally so it stays offline). Or ask an agent to enrich a plain-text mention or research a topic onto the canvas. A reference is a *source* card: an agent writes its bibliographic *facts*, never your annotation.
 
-**Summaries & the zoom-out map.** Every note and prose card gets a one-line **summary** generated **locally by [Ollama](https://ollama.com)**. Zoom out past ~70% and each card shows its summary instead of its full text (orange, one uniform readable size, cards grow to fit so nothing is cut off) — so a big piece reads at a glance. No Ollama? Summaries just stay empty and nothing breaks.
+**Summaries & the zoom-out map.** Every note and prose card gets a one-line **summary** generated **locally by [Ollama](https://ollama.com)**. Cards always show their full text at every zoom; summaries feed the agent's `read_map`. No Ollama? Summaries just stay empty and nothing breaks.
 
 **Linear draft — read the canvas as a piece.** A **draft drawer** slides in from the right edge — pull it out with the **«** tab, or cycle **Canvas · Split · Draft** with `⌘/Ctrl + \` (add `⇧` to walk back) — compiling your prose cards into one continuous reading pane, in true narrative order: **sections** run left → right as the order of the piece, and **within a section** cards run top → bottom. Click any paragraph to jump to its card on the canvas; **Copy as Markdown** exports the whole thing with `##` headings. Only prose compiles (notes, figures, questions, and feedback stay off the page), and you can opt any card out of the draft so an aside doesn't read as part of the piece. It's read-only — the canvas stays the one place prose is written — and an agent reads the very same compile through `read_draft`.
 
@@ -62,22 +64,22 @@ npx playwright install chromium
 
 ## Running the app
 
-Elves is two local processes: a small **server** that owns the canvas file, and the **web app**. Run both together:
+Dwarves is two local processes: a small **server** that owns the canvas file, and the **web app**. Run both together:
 
 ```bash
 npm run dev:all
 ```
 
-Then open **http://localhost:5173**.
+Then open **http://localhost:5373**.
 
-- The app runs on `http://localhost:5173` (Vite).
-- The canvas server runs on `http://localhost:5199` and reads/writes projects under `data/projects/`.
+- The app runs on `http://localhost:5373` (Vite).
+- The canvas server runs on `http://localhost:5399` and reads/writes projects under `data/projects/`.
 
 Prefer separate terminals? Run them independently:
 
 ```bash
-npm run server   # canvas server on :5199 (watch mode)
-npm run dev       # web app on :5173
+npm run server   # canvas server on :5399 (watch mode)
+npm run dev       # web app on :5373
 ```
 
 > A small tldraw watermark appears in the corner — that's the free tier and is fine for personal use.
@@ -98,12 +100,11 @@ npm run dev       # web app on :5173
 
 With the app running (`npm run dev:all`), an agent reaches the canvas through a scoped
 MCP server. Point any MCP-capable agent — Claude Code, Codex, GitHub Copilot, or another —
-at the `elves` server (see `.mcp.json`); in Claude Code, opening this project offers it,
+at the `dwarves` server (see `.mcp.json`); in Claude Code, opening this project offers it,
 so approve it. Then ask the agent things like *"read my canvas and flag weak spots"*,
 *"dedupe my note cards"*, *"transcribe this handwritten note"*, *"reorder these points for
 flow"*, *"read my draft top-to-bottom and tell me where it sags"*, *"suggest where a
-diagram would help"*, *"ask me questions about the gaps"*, or *"play devil's advocate on
-my canvas"* to summon a review pass. Its changes appear live and are undoable. A review
+diagram would help"*, *"ask me questions about the gaps"*, or *"where does the tension drop?"* to summon a review pass. Its changes appear live and are undoable. A review
 you summon from the app's bottom-right **Review** button launches a configured headless
 agent, so it runs without waiting for you to open a separate chat.
 
@@ -116,7 +117,7 @@ card or a few (or select nothing to mean the whole canvas) and press **`/`** —
 chat box appears at the bottom. Type a request — *"critique this card"*, *"what's a
 better way to phrase this?"*, *"organise these into sections"*, *"dedupe all the cards"*
 — and the server runs your configured CLI (`ELVES_CLI`, default `claude`) as a one-shot
-headless agent wired to the same `elves` MCP, so it has the same canvas tools it does in
+headless agent wired to the same `dwarves` MCP, so it has the same canvas tools it does in
 the terminal. Its reasoning and each tool call stream into the box as a live transcript
 while its edits land on the canvas (with the usual presence glow); a **Cancel** button
 stops it. The headless agent is locked to the canvas tools plus read-only web
@@ -133,15 +134,16 @@ transcribes into *note* cards, creates *reference* and *figure* cards, and asks 
 
 ## Configuration
 
-Set via environment variables:
+Set via environment variables. The names keep their `ELVES_` prefix from upstream Elves, so Dwarves stays easy to merge with it.
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
 | `ELVES_DATA` | `data/` (relative to `server/`) | Data root holding `projects/<id>/…` — **all your projects**. |
-| `PORT` | `5199` | Port for the canvas server. |
-| `VITE_SERVER_URL` | `http://localhost:5199` | Where the web app looks for the server. |
+| `PORT` | `5399` | Port for the canvas server. |
+| `VITE_SERVER_URL` | `http://localhost:5399` | Where the web app looks for the server. |
 | `ELVES_AGENT` | `claude` | Authorship id the MCP server stamps on cards it creates — set it per agent (e.g. `codex`) so each agent's writing carries its own mark. |
 | `ELVES_CLI` | `claude` | The CLI the in-app agent box (`/`) spawns to run a request. Must be installed and authenticated locally. v1 fully supports `claude`. |
+| `ELVES_RECLAIM_ABSENT_OWNER` | unset | Set to `1` to let startup take over a data-root marker left on this machine by a server process that no longer exists (see "Data-root ownership"). |
 | `OLLAMA_HOST` | `http://localhost:11434` | Ollama endpoint used for summaries. |
 | `OLLAMA_MODEL` | `llama3.2` | Local model used for summaries. |
 
@@ -153,7 +155,7 @@ ELVES_DATA=./scratch-data npm run server
 
 ### Data-root ownership
 
-Only one Elves server can use a given canonical `ELVES_DATA` path on a machine.
+Only one Dwarves server can use a given canonical `ELVES_DATA` path on a machine.
 Startup claims an OS-local marker outside the data folder before running migrations
 or binding the API port. A second server exits with the owning PID, hostname, data
 root, and marker path; connect to the existing server or stop it first.
@@ -163,44 +165,45 @@ every server which could use that data root is stopped, inspect the path printed
 the startup error, then recover explicitly:
 
 ```bash
-npm run data:recover -- --data-root /absolute/path/to/Elves --force
+npm run data:recover -- --data-root /absolute/path/to/Dwarves --force
 ```
 
 Recovery refuses a live or inconclusive local PID even with `--force`. Foreign-host
 and malformed markers require the same explicit command because their liveness
-cannot be inferred safely. Normal startup never removes an existing marker.
+cannot be inferred safely. Normal startup never removes an existing marker, unless
+`ELVES_RECLAIM_ABSENT_OWNER=1` is set: then it takes over a marker left on this machine by a
+server process that no longer exists. That's for development on Windows, where a watcher
+restart hard-kills the server before it can release its marker.
 
-### Card summaries (zoom-out gists)
+### Card summaries
 
 Every note and prose card gets a one-line, model-authored **summary** — shown on the agent's
-`read_map` and, when you **zoom out past ~70%**, in place of the card's full text, so the
-shape of a big piece reads at a glance. Summaries render in the agent's accent color at one
-uniform size, and a card grows to fit its summary so nothing is clipped.
+`read_map`. Cards themselves always show their full text, at every zoom.
 
 Summaries are generated **server-side and locally** via
 [Ollama](https://ollama.com): install it and `ollama pull llama3.2`, and the server
 summarizes cards as you edit (and backfills existing ones on startup). No Ollama? No
-problem — summaries stay empty and the map/zoom fall back to a mechanical first-line
+problem — summaries stay empty and the map falls back to a mechanical first-line
 truncation; nothing breaks. Summaries never touch your card text — like section headers
 and comments, they're an agent-authored label *about* a card. Point `OLLAMA_HOST` /
 `OLLAMA_MODEL` at a different endpoint or model if you'd rather not use the defaults.
 
 ## Syncing across machines
 
-Elves keeps every project as plain files under a single data root, so syncing to
+Dwarves keeps every project as plain files under a single data root, so syncing to
 another machine is just syncing that folder. This setup keeps the app fully
 local-first (offline, instant load) on each machine — nothing goes to the cloud.
 
 **One-time, per machine:**
 
-1. **Pick a data folder outside the repo** — e.g. `~/Elves`. Move your existing
-   projects into it: `mkdir -p ~/Elves && mv data/projects ~/Elves/`.
+1. **Pick a data folder outside the repo** — e.g. `~/Dwarves`. Move your existing
+   projects into it: `mkdir -p ~/Dwarves && mv data/projects ~/Dwarves/`.
 2. **Point the app at it.** Copy `.env.example` to `.env` and set an absolute path:
-   `ELVES_DATA=/Users/<you>/Elves`. (`.env` is per-machine and gitignored; the two
+   `ELVES_DATA=/Users/<you>/Dwarves`. (`.env` is per-machine and gitignored; the two
    machines may use different paths.)
-3. **Install [Syncthing](https://syncthing.net)** and add `~/Elves` as a shared
+3. **Install [Syncthing](https://syncthing.net)** and add `~/Dwarves` as a shared
    folder, using the **same Folder ID** on both machines, then pair the two
-   devices. Copy `docs/syncthing.stignore` to `~/Elves/.stignore` so Syncthing
+   devices. Copy `docs/syncthing.stignore` to `~/Dwarves/.stignore` so Syncthing
    ignores the server's transient write-temps.
 
 Syncthing then keeps the folder identical between your machines, peer-to-peer and
@@ -218,8 +221,8 @@ startup naming the files so you can review and delete them.
 | Script | What it does |
 | --- | --- |
 | `npm run dev:all` | Run the server and web app together (usual dev command). |
-| `npm run dev` | Web app only (Vite, `:5173`). |
-| `npm run server` | Canvas server only, watch mode (`:5199`). |
+| `npm run dev` | Web app only (Vite, `:5373`). |
+| `npm run server` | Canvas server only, watch mode (`:5399`). |
 | `npm run start` | Canvas server once (no watch). |
 | `npm run build` | Production build of the web app. |
 | `npm run preview` | Preview the production build. |
@@ -303,4 +306,4 @@ Your writing stays yours. The data model separates **source** (reference) cards 
 
 ## License
 
-[MIT](./LICENSE) © Maggie Appleton. Shared so others can read, learn from, and tinker with the tool. Your own writing and notes live under `data/` (gitignored) and stay on your machine — they are never part of this repository.
+[MIT](./LICENSE) © Maggie Appleton, the author of Elves, which Dwarves is based on. Shared so others can read, learn from, and tinker with the tool. Your own writing and notes live under `data/` (gitignored) and stay on your machine — they are never part of this repository.

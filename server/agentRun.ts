@@ -93,7 +93,7 @@ export function buildPreamble(
   const scope = hasSelection
     ? 'The user has cards selected on the canvas — call read_selection to see them and scope your work to those cards.'
     : 'The user has nothing selected — call read_map to see the whole canvas and work across it.'
-  const base = `You are running inside the Elves app, triggered from the canvas by the user. Operate on the project with id "${projectId}". ${scope}`
+  const base = `You are running inside the Dwarves app, triggered from the canvas by the user. Operate on the project with id "${projectId}". ${scope}`
   if (profile !== 'annotation-reply') return base
   return `${base}
 

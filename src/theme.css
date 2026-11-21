@@ -1,6 +1,6 @@
 :root {
   /* =========================================================================
-     Elves design tokens — warm cream + desaturated deep green, OKLCH.
+     Dwarves design tokens — warm cream + desaturated deep green, OKLCH.
      Structured as a Campsite-style semantic layer: neutral surfaces separated
      by fine translucent borders and small, soft, layered shadows. Accent
      (green) is used sparingly — selection, primary state, meaningful status.
@@ -260,7 +260,7 @@ body {
 }
 
 /* ---- Shape-toolbar toggle (pencil, bottom-left beside the zoom) --------- */
-/* Elves never uses tldraw's colour/style panel — hide it permanently. */
+/* Dwarves never uses tldraw's colour/style panel — hide it permanently. */
 .tl-container .tlui-style-panel__wrapper { display: none; }
 /* The pencil toggle shows/hides tldraw's shape toolbar (bottom-center).
    The top-left menu and the bottom-left zoom panel always stay put. */

@@ -178,7 +178,7 @@ test('a figure title is checked as well as its description', async () => {
 
 test("transcription is never style-checked — those are the user's own words", async () => {
   // create_note_card digitizes handwriting. Tidying it would be rewriting the
-  // user's notes, which is the one thing an Elves agent must never do.
+  // user's notes, which is the one thing an Dwarves agent must never do.
   const client = await connectClient()
   const { text } = await callText(client, 'create_note_card', {
     project: 'p',

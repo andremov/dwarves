@@ -1,7 +1,7 @@
 import { resolve } from 'node:path'
 
 // Process-local coordination only. This registry serializes mutations inside
-// one Elves server process; it cannot coordinate multiple server processes,
+// one Dwarves server process; it cannot coordinate multiple server processes,
 // Syncthing, or manual filesystem writers.
 const chains = new Map<string, Promise<unknown>>()
 

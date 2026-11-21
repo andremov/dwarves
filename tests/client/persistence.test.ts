@@ -411,7 +411,7 @@ test('createSaver does not wedge when a save rejects: the error is swallowed and
   await Promise.resolve()
   await Promise.resolve()
 
-  expect(errorSpy).toHaveBeenCalledWith('Elves: canvas save failed', expect.any(Error))
+  expect(errorSpy).toHaveBeenCalledWith('Dwarves: canvas save failed', expect.any(Error))
   // Flush from the pendingDirty retry happened despite the first save rejecting.
   expect(saveFn).toHaveBeenCalledTimes(2)
 

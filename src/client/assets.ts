@@ -3,7 +3,7 @@ import { atom } from 'tldraw'
 
 const BASE = (import.meta as any).env?.VITE_SERVER_URL ?? 'http://localhost:5399'
 
-// Elves shows one project at a time. assetUrl() is called deep inside the tldraw
+// Dwarves shows one project at a time. assetUrl() is called deep inside the tldraw
 // shape renderer where threading the project id as a prop is awkward. A tldraw
 // atom keeps those tracked shape renderers live when App commits a project switch.
 const assetProjectId = atom<string | null>('asset project id', null)

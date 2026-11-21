@@ -165,7 +165,7 @@ export function createMcpServer(baseUrl: string): McpServer {
 
   server.tool(
     'list_projects',
-    'List the writing projects available in Elves as {id, name}. Call this first to discover project ids; every other tool requires a `project` id. If which project to work in is unclear, show these to the user and ask.',
+    'List the writing projects available in Dwarves as {id, name}. Call this first to discover project ids; every other tool requires a `project` id. If which project to work in is unclear, show these to the user and ask.',
     {},
     async () => ({ content: [{ type: 'text', text: JSON.stringify(await listProjectsTool(baseUrl), null, 2) }] }),
   )
@@ -478,7 +478,7 @@ export function createMcpServer(baseUrl: string): McpServer {
         title: `${p.name} review pass`,
         description: `${p.summary} A bounded, in-character editorial pass over the canvas; annotates only, never writes prose.`,
         argsSchema: {
-          project: z.string().optional().describe('The Elves project id to review (from list_projects). Omit to be asked.'),
+          project: z.string().optional().describe('The Dwarves project id to review (from list_projects). Omit to be asked.'),
           focus: z.string().optional().describe("Optional scope for the pass, e.g. 'just the opening section'."),
         },
       },
@@ -487,7 +487,7 @@ export function createMcpServer(baseUrl: string): McpServer {
           role: 'user' as const,
           content: {
             type: 'text' as const,
-            text: `Summon ${p.name} for a review pass on my Elves canvas.
+            text: `Summon ${p.name} for a review pass on my Dwarves canvas.
 
 1. Pick the project: ${project ? `use '${project}'.` : 'call list_projects and confirm with me if it is ambiguous.'}
 2. Check list_reviews first — if a pending '${id}' pass is already waiting, claim it with start_review(reviewId); otherwise open an ad-hoc pass with start_review(personality: '${id}'${focus ? `, focus: ${JSON.stringify(focus)}` : ''}).
@@ -515,7 +515,7 @@ async function main() {
 // Run only when executed directly (not when imported by tests).
 if (process.argv[1] && process.argv[1].endsWith('index.ts')) {
   main().catch((err) => {
-    console.error('Elves MCP server failed:', err)
+    console.error('Dwarves MCP server failed:', err)
     process.exit(1)
   })
 }

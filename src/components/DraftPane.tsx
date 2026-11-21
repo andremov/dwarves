@@ -81,7 +81,7 @@ export function DraftPane({
       nextStatus = 'copied'
     } catch (err) {
       if (copyAttemptRef.current !== attempt) return
-      console.error('Elves: copy draft failed', err)
+      console.error('Dwarves: copy draft failed', err)
       nextStatus = 'error'
     }
     if (copyAttemptRef.current !== attempt) return

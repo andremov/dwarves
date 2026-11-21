@@ -178,13 +178,13 @@ export async function recoverDataRootOwnership(
   const first = await readOwnerInspection(markerPath)
   const existingArtifacts = await ownershipTransitionArtifacts(markerPath)
   if (!first.exists && existingArtifacts.length === 0) {
-    throw new DataRootOwnershipError(`No Elves ownership marker exists at ${markerPath}.`, canonicalRoot, markerPath)
+    throw new DataRootOwnershipError(`No Dwarves ownership marker exists at ${markerPath}.`, canonicalRoot, markerPath)
   }
   ensureOwnerMatchesRoot(first.owner, canonicalRoot, markerPath)
   ensureRecoverable(first.owner, canonicalRoot, markerPath, options)
   if (!options.force) {
     throw new DataRootOwnershipError(
-      `${ownershipMessage(canonicalRoot, markerPath, first.reason)} Re-run with --force after stopping every candidate Elves server.`,
+      `${ownershipMessage(canonicalRoot, markerPath, first.reason)} Re-run with --force after stopping every candidate Dwarves server.`,
       canonicalRoot,
       markerPath,
       first.owner,
@@ -330,7 +330,7 @@ function ensureRecoverable(
 }
 
 function ownershipMessage(canonicalRoot: string, markerPath: string, reason: string): string {
-  return `Elves data root ${canonicalRoot} is unavailable: ${reason}. Ownership marker: ${markerPath}. ` +
+  return `Dwarves data root ${canonicalRoot} is unavailable: ${reason}. Ownership marker: ${markerPath}. ` +
     `Inspect it, stop all candidate servers, then run npm run data:recover -- --data-root ${shellQuote(canonicalRoot)} --force.`
 }
 
@@ -443,7 +443,7 @@ async function assertExternalMarker(canonicalRoot: string, markerPath: string): 
   const location = relative(canonicalRoot, await canonicalDataRoot(markerPath))
   if (location === '' || (!location.startsWith('..') && !isAbsolute(location))) {
     throw new DataRootOwnershipError(
-      `Elves ownership marker ${markerPath} must be outside data root ${canonicalRoot}.`,
+      `Dwarves ownership marker ${markerPath} must be outside data root ${canonicalRoot}.`,
       canonicalRoot,
       markerPath,
     )

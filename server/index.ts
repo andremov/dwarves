@@ -175,7 +175,7 @@ async function serve(
     httpServer.once('error', onError)
     httpServer.listen(port, host, () => {
       httpServer.off('error', onError)
-      console.log(`Elves server on http://${host}:${port}  (data: ${ownedDataRoot}, summarizer: ${summarizer.label})`)
+      console.log(`Dwarves server on http://${host}:${port}  (data: ${ownedDataRoot}, summarizer: ${summarizer.label})`)
       resolveListen()
     })
   })
@@ -222,6 +222,6 @@ async function backfillSummaries(dataRoot: string, app: CanvasServer, signal: Ab
 }
 
 main().catch((err) => {
-  console.error('Elves server failed to start:', err)
+  console.error('Dwarves server failed to start:', err)
   process.exit(1)
 })

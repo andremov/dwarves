@@ -41,7 +41,7 @@ export function trackSelection(editor: Editor, opts: TrackSelectionOptions): () 
   const post =
     opts.post ??
     ((pid: string, ids: string[]) =>
-      void postSelection(pid, ids).catch((err) => console.error('Elves: selection report failed', err)))
+      void postSelection(pid, ids).catch((err) => console.error('Dwarves: selection report failed', err)))
 
   let timer: ReturnType<typeof setTimeout> | null = null
   // The last id-set actually sent, so a reactor re-run that doesn't change the

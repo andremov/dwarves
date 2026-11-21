@@ -243,7 +243,7 @@ export function createSaver(saveFn: () => Promise<void>) {
     }
     saving = true
     saveFn()
-      .catch((err) => console.error('Elves: canvas save failed', err))
+      .catch((err) => console.error('Dwarves: canvas save failed', err))
       .finally(() => {
         saving = false
         if (pendingDirty) {

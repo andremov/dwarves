@@ -231,7 +231,7 @@ async function startServer(dataRoot: string, runtimeRoot: string, extraEnv: Node
   let stderr = ''
   child.stdout!.on('data', (chunk) => { stdout += String(chunk) })
   child.stderr!.on('data', (chunk) => { stderr += String(chunk) })
-  await waitUntil(() => stdout.includes('Elves server on'), () => {
+  await waitUntil(() => stdout.includes('Dwarves server on'), () => {
     if (child.exitCode !== null) throw new Error(`server exited ${child.exitCode}: ${stderr}`)
   })
   return { child, url: `http://127.0.0.1:${port}` }
