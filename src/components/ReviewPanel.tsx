@@ -24,13 +24,14 @@ interface Props {
 // type, so the panel row and the comments that pass leaves on the canvas read
 // as the same voice.
 const TYPE_TONE: Record<CommentType, string> = {
-  abstract: 'var(--elves-cc-abstract-label)',
-  told: 'var(--elves-cc-told-label)',
-  unearned: 'var(--elves-cc-unearned-label)',
-  'false-note': 'var(--elves-cc-falsenote-label)',
-  slack: 'var(--elves-cc-slack-label)',
-  buried: 'var(--elves-cc-buried-label)',
-  'so-what': 'var(--elves-cc-sowhat-label)',
+  telling: 'var(--elves-cc-telling-label)',
+  flat: 'var(--elves-cc-flat-label)',
+  stakes: 'var(--elves-cc-stakes-label)',
+  dialogue: 'var(--elves-cc-dialogue-label)',
+  pov: 'var(--elves-cc-pov-label)',
+  'info-dump': 'var(--elves-cc-infodump-label)',
+  continuity: 'var(--elves-cc-continuity-label)',
+  drag: 'var(--elves-cc-drag-label)',
   unclear: 'var(--elves-cc-unclear-label)',
   tighten: 'var(--elves-cc-tighten-label)',
 }

@@ -3,7 +3,7 @@ import type { ChangeSetToken, PendingChangeSetV2 } from '../../server/canvasMeta
 import type { CanvasSnapshot } from '../../server/store'
 import { isChangeSet } from '../model/changeset'
 
-const BASE = (import.meta as any).env?.VITE_SERVER_URL ?? 'http://localhost:5299'
+const BASE = (import.meta as any).env?.VITE_SERVER_URL ?? 'http://localhost:5399'
 
 export type { CanvasSnapshot, ChangeSetToken, PendingChangeSetV2, Project }
 

@@ -78,13 +78,13 @@ async function replyComposer(thread: any) {
 }
 
 async function addTwoComments(page: any, request: any) {
-  await addCardAndComment(page, request, { type: 'abstract', text: 'The opening needs a source.' })
+  await addCardAndComment(page, request, { type: 'telling', text: 'The opening needs a source.' })
   const [cardId] = await serverCardIds(request, projectId)
   await request.post(`${BASE}/projects/${projectId}/changeset`, {
     data: {
       id: `cs-${Date.now()}-second`,
       author: 'claude',
-      ops: [{ kind: 'add_comment', cardId, comment: { type: 'so-what', text: 'The ending needs a clearer bridge.' } }],
+      ops: [{ kind: 'add_comment', cardId, comment: { type: 'pov', text: 'The ending needs a clearer bridge.' } }],
     },
   })
 }
@@ -119,14 +119,14 @@ test('comments do not reserve a marker row before the next card', async ({ page,
         {
           kind: 'add_comment', cardId: firstCardId,
           comment: {
-            type: 'so-what',
+            type: 'pov',
             text: 'This comment deliberately adds enough detail to occupy multiple lines beneath the first card and expose its real layout footprint.',
           },
         },
         {
           kind: 'add_comment', cardId: firstCardId,
           comment: {
-            type: 'abstract',
+            type: 'telling',
             text: 'A second annotation makes the hidden overflow footprint taller than the nominal card body.',
           },
         },
@@ -144,11 +144,11 @@ test('comments do not reserve a marker row before the next card', async ({ page,
 })
 
 test("Claude's injected comment renders as a pin and is one Ctrl-Z away from gone", async ({ page, request }) => {
-  await addCardAndComment(page, request, { type: 'abstract', text: 'no source yet' })
+  await addCardAndComment(page, request, { type: 'telling', text: 'no source yet' })
 
   const pin = page.getByTestId('annotation-pin')
   await expect(pin).toBeVisible()
-  await expect(pin).toHaveAttribute('data-type', 'abstract')
+  await expect(pin).toHaveAttribute('data-type', 'telling')
 
   // A single Ctrl-Z reverts Claude's change.
   await page.keyboard.press('Control+z')
@@ -181,8 +181,8 @@ test('promoted threads avoid their source and keep prior threads selectable', as
   await moveCardsTool(BASE, projectId, {
     moves: [{ cardId: secondCardId, x: firstCard.x + 520, y: secondCard.y + 220 }],
   })
-  await addComment(request, firstCardId, { type: 'abstract', text: 'Needs evidence.' })
-  await addComment(request, secondCardId, { type: 'told', text: 'Weak argument.' })
+  await addComment(request, firstCardId, { type: 'telling', text: 'Needs evidence.' })
+  await addComment(request, secondCardId, { type: 'stakes', text: 'Weak argument.' })
 
   const firstPin = page.locator(`[data-shape-id="${firstCardId}"] [data-testid="annotation-pin"]`)
   const secondPin = page.locator(`[data-shape-id="${secondCardId}"] [data-testid="annotation-pin"]`)
@@ -240,7 +240,7 @@ test('promoted threads avoid their source and keep prior threads selectable', as
   await page.setViewportSize({ width: 720, height: 640 })
   await page.reload()
   await createFeedbackTool(BASE, projectId, {
-    text: 'Constrained edge.', x: 80, y: 300, type: 'told', reviewer: 'landing',
+    text: 'Constrained edge.', x: 80, y: 300, type: 'stakes', reviewer: 'stakes',
   })
   const { feedback } = await readMapTool(BASE, projectId)
   const constrainedFeedback = feedback.find((entry) => entry.text === 'Constrained edge.')!
@@ -289,7 +289,7 @@ test('identical comments on different cards have distinct pins', async ({ page, 
 })
 
 test('a fresh session has no open annotation threads', async ({ page, request }) => {
-  await addCardAndComment(page, request, { type: 'abstract', text: 'Session-only thread.' })
+  await addCardAndComment(page, request, { type: 'telling', text: 'Session-only thread.' })
   await page.getByTestId('annotation-pin').click()
   await expect(page.getByTestId('annotation-thread')).toHaveCount(1)
   await page.reload()
@@ -299,7 +299,7 @@ test('a fresh session has no open annotation threads', async ({ page, request })
 })
 
 test('an annotation draft survives close, reopen, and view changes until explicit discard', async ({ page, request }) => {
-  await addCardAndComment(page, request, { type: 'so-what', text: 'Keep the response with this exact thread.' })
+  await addCardAndComment(page, request, { type: 'pov', text: 'Keep the response with this exact thread.' })
   const pin = page.getByTestId('annotation-pin')
   await pin.click()
   let thread = page.getByTestId('annotation-thread')
@@ -322,7 +322,7 @@ test('an annotation draft survives close, reopen, and view changes until explici
 })
 
 test('hover and keyboard focus show a compact read-only preview', async ({ page, request }) => {
-  const cardId = await addCardAndComment(page, request, { type: 'so-what', text: 'The complete conversation is readable here.' })
+  const cardId = await addCardAndComment(page, request, { type: 'pov', text: 'The complete conversation is readable here.' })
   const commentId = (await cardRecord(request, cardId)).props.comments[0].id
   const response = await request.post(`${BASE}/projects/${projectId}/changeset`, {
     data: {
@@ -372,7 +372,7 @@ test('hover and keyboard focus show a compact read-only preview', async ({ page,
 })
 
 test('clicking a pointer preview expands into the complete thread without covering its source', async ({ page, request }) => {
-  const cardId = await addCardAndComment(page, request, { type: 'abstract', text: 'Open this conversation deliberately.' })
+  const cardId = await addCardAndComment(page, request, { type: 'telling', text: 'Open this conversation deliberately.' })
   const commentId = (await cardRecord(request, cardId)).props.comments[0].id
   await request.post(`${BASE}/projects/${projectId}/changeset`, { data: {
     id: `preview-open-${Date.now()}`, author: 'user', ops: [{
@@ -411,7 +411,7 @@ test('clicking a pointer preview expands into the complete thread without coveri
 })
 
 test('pointer close is briefly inert while keyboard and reduced-motion close are immediate', async ({ page, request }) => {
-  await addCardAndComment(page, request, { type: 'abstract', text: 'Close this thread deliberately.' })
+  await addCardAndComment(page, request, { type: 'telling', text: 'Close this thread deliberately.' })
   const pin = page.getByTestId('annotation-pin')
   await pin.click()
   let popover = page.getByTestId('annotation-popover')
@@ -447,11 +447,11 @@ test('pointer close is briefly inert while keyboard and reduced-motion close are
 
 test('attached and floating threads share compact neutral action chrome', async ({ page, request }) => {
   const cardId = await addCardAndComment(page, request, {
-    type: 'abstract', text: 'Keep the source visible.',
+    type: 'telling', text: 'Keep the source visible.',
   })
   await createFeedbackTool(BASE, projectId, {
     text: 'Keep this floating note quiet.', x: 780, y: 260,
-    type: 'told', reviewer: 'landing',
+    type: 'stakes', reviewer: 'stakes',
   })
   const { feedback } = await readMapTool(BASE, projectId)
   const feedbackId = feedback.find((item: any) => item.text === 'Keep this floating note quiet.')!.id
@@ -499,7 +499,7 @@ test('attached and floating threads share compact neutral action chrome', async 
 })
 
 test('resolved card confirmation restores only its target and preserves later work', async ({ page, request }) => {
-  const cardId = await addCardAndComment(page, request, { type: 'abstract', text: 'Resolve this exact comment.' })
+  const cardId = await addCardAndComment(page, request, { type: 'telling', text: 'Resolve this exact comment.' })
   const commentId = (await cardRecord(request, cardId)).props.comments[0].id
   const pin = page.locator(`[data-annotation-target="card:${cardId}:${commentId}"]`)
   await page.getByTestId('draft-open').click()
@@ -540,9 +540,9 @@ test('resolved card confirmation restores only its target and preserves later wo
 })
 
 test('floating feedback uses its pre-resolve origin and timeout does not move focus', async ({ page, request }) => {
-  await addCardAndComment(page, request, { type: 'so-what', text: 'Anchor the canvas.' })
+  await addCardAndComment(page, request, { type: 'pov', text: 'Anchor the canvas.' })
   await createFeedbackTool(BASE, projectId, {
-    text: 'Resolve floating feedback.', x: 520, y: 260, type: 'told', reviewer: 'landing',
+    text: 'Resolve floating feedback.', x: 520, y: 260, type: 'stakes', reviewer: 'stakes',
   })
   const { feedback } = await readMapTool(BASE, projectId)
   const feedbackId = feedback.find((entry: any) => entry.text === 'Resolve floating feedback.')!.id
@@ -568,16 +568,16 @@ test('floating feedback uses its pre-resolve origin and timeout does not move fo
 })
 
 test('foreground threads promote independently, persist resolution, and prune only a deleted anchor', async ({ page, request }) => {
-  const proseCardId = await addCardAndComment(page, request, { type: 'abstract', text: 'Resolve this card comment.' })
+  const proseCardId = await addCardAndComment(page, request, { type: 'telling', text: 'Resolve this card comment.' })
   const proseCommentId = (await cardRecord(request, proseCardId)).props.comments[0].id
 
   await createNoteCardTool(BASE, projectId, { text: 'A removable annotation anchor.', x: 420, y: 180 })
   await expect.poll(async () => (await serverCardIds(request, projectId)).length).toBe(2)
   const removableCardId = (await serverCardIds(request, projectId)).find((id) => id !== proseCardId)!
-  await addComment(request, removableCardId, { type: 'so-what', text: 'Delete only this anchor.' })
+  await addComment(request, removableCardId, { type: 'pov', text: 'Delete only this anchor.' })
 
   await createFeedbackTool(BASE, projectId, {
-    text: 'Keep the floating annotation open.', x: 780, y: 260, type: 'told', reviewer: 'landing',
+    text: 'Keep the floating annotation open.', x: 780, y: 260, type: 'stakes', reviewer: 'stakes',
   })
   const { feedback } = await readMapTool(BASE, projectId)
   const feedbackId = feedback.find((item: any) => item.text === 'Keep the floating annotation open.')!.id
@@ -617,7 +617,7 @@ test('foreground threads promote independently, persist resolution, and prune on
 })
 
 test('attached comment pins remain compact at overview zoom', async ({ page, request }) => {
-  await addCardAndComment(page, request, { type: 'abstract', text: 'A comment that must become a marker.' })
+  await addCardAndComment(page, request, { type: 'telling', text: 'A comment that must become a marker.' })
   await page.getByRole('button', { name: /Zoom — 100%/ }).click()
   await page.getByRole('menuitem', { name: /Zoom out/ }).click()
 
@@ -626,8 +626,8 @@ test('attached comment pins remain compact at overview zoom', async ({ page, req
 })
 
 test('an annotation reply streams then persists Claude’s answer', async ({ page, request }) => {
-  const cardId = await addCardAndComment(page, request, { type: 'abstract', text: 'This claim needs a source.' })
-  await addComment(request, cardId, { type: 'so-what', text: 'This other thread stays editable.' })
+  const cardId = await addCardAndComment(page, request, { type: 'telling', text: 'This claim needs a source.' })
+  await addComment(request, cardId, { type: 'pov', text: 'This other thread stays editable.' })
   const [firstComment, secondComment] = (await cardRecord(request, cardId)).props.comments
   const firstPin = page.locator(`[data-annotation-target="card:${cardId}:${firstComment.id}"]`)
   const secondPin = page.locator(`[data-annotation-target="card:${cardId}:${secondComment.id}"]`)
@@ -667,7 +667,7 @@ test('an annotation reply streams then persists Claude’s answer', async ({ pag
 })
 
 test('a failed foreground reply retries its persisted user turn once', async ({ page, request }) => {
-  await addCardAndComment(page, request, { type: 'abstract', text: 'Retry this foreground conversation.' })
+  await addCardAndComment(page, request, { type: 'telling', text: 'Retry this foreground conversation.' })
   let releaseFailedRun!: () => void
   const failedRun = new Promise<void>((resolve) => { releaseFailedRun = resolve })
   let interceptedRuns = 0
@@ -711,7 +711,7 @@ test('a failed foreground reply retries its persisted user turn once', async ({ 
 
 test('a response-lost reply resend reuses its persisted user turn', async ({ page, request }) => {
   const cardId = await addCardAndComment(page, request, {
-    type: 'abstract', text: 'Keep exactly one durable user turn.',
+    type: 'telling', text: 'Keep exactly one durable user turn.',
   })
   const commentId = (await cardRecord(request, cardId)).props.comments[0].id
   const pin = page.locator(`[data-shape-id="${cardId}"] [data-testid="annotation-pin"]`)
@@ -746,7 +746,7 @@ test('a response-lost reply resend reuses its persisted user turn', async ({ pag
 
 test('a changed resend clears the retained failed identity before an old draft is sent again', async ({ page, request }) => {
   const cardId = await addCardAndComment(page, request, {
-    type: 'abstract', text: 'Do not retain an old retry identity after a new reply persists.',
+    type: 'telling', text: 'Do not retain an old retry identity after a new reply persists.',
   })
   const commentId = (await cardRecord(request, cardId)).props.comments[0].id
   await page.locator(`[data-shape-id="${cardId}"] [data-testid="annotation-pin"]`).click()
@@ -785,7 +785,7 @@ test('a changed resend clears the retained failed identity before an old draft i
 
 test('a long annotation transcript remains inside the canvas and scrolls internally', async ({ page, request }) => {
   await page.setViewportSize({ width: 800, height: 420 })
-  const cardId = await addCardAndComment(page, request, { type: 'so-what', text: 'Keep this full annotation inside the stage.' })
+  const cardId = await addCardAndComment(page, request, { type: 'pov', text: 'Keep this full annotation inside the stage.' })
   const commentId = (await cardRecord(request, cardId)).props.comments[0].id
   const response = await request.post(`${BASE}/projects/${projectId}/changeset`, {
     data: {
@@ -818,7 +818,7 @@ test('a long annotation transcript remains inside the canvas and scrolls interna
 })
 
 test('a foreground thread follows its pin through pan, zoom, and card movement', async ({ page, request }) => {
-  const cardId = await addCardAndComment(page, request, { type: 'so-what', text: 'Keep this thread aligned with its card.' })
+  const cardId = await addCardAndComment(page, request, { type: 'pov', text: 'Keep this thread aligned with its card.' })
   const pin = page.locator(`[data-shape-id="${cardId}"] [data-testid="annotation-pin"]`)
   await pin.click()
   const thread = page.getByTestId('annotation-thread')

@@ -19,7 +19,7 @@ import { acquireDataRootOwnership, type DataRootOwnership } from './dataRootOwne
 
 const here = dirname(fileURLToPath(import.meta.url))
 const dataRoot = process.env.ELVES_DATA ?? join(here, '..', 'data')
-const port = Number(process.env.PORT ?? 5299)
+const port = Number(process.env.PORT ?? 5399)
 const host = resolveHost()
 
 async function main() {

@@ -19,7 +19,7 @@ const openComposer = (tree: ReactTestRenderer, index = 0) => {
 test('preview has no reply, retry, resolve, or close controls', () => {
   const tree = create(createElement(AnnotationThread, {
     comment: {
-      id: 'c1', type: 'so-what', text: 'Initial finding', resolved: false, author: 'claude',
+      id: 'c1', type: 'pov', text: 'Initial finding', resolved: false, author: 'claude',
       messages: [
         { id: 'm1', author: 'claude', text: 'Initial finding', createdAt: '2026-08-30T09:00:00Z' },
         { id: 'm2', author: 'user', text: 'What would fix it?', createdAt: '2026-08-30T09:01:00Z' },
@@ -40,14 +40,14 @@ test('preview has no reply, retry, resolve, or close controls', () => {
   expect(tree.root.findByProps({ className: 'elves-annotation-thread__reply-count' }).props['aria-label'])
     .toBe('1 reply')
   expect(tree.root.findByProps({ 'data-testid': 'annotation-thread' }).props['aria-label'])
-    .toBe('Annotation preview: So what from Claude: Initial finding 1 reply')
+    .toBe('Annotation preview: Point of view from Claude: Initial finding 1 reply')
   expect(tree.root.findAllByType('textarea')).toHaveLength(0)
   expect(tree.root.findAllByType('button')).toHaveLength(0)
 })
 
 test('preview clamps the original annotation while open mode retains every durable turn', () => {
   const comment = {
-    id: 'c1', type: 'abstract' as const, text: 'Original annotation', resolved: false, author: 'claude',
+    id: 'c1', type: 'telling' as const, text: 'Original annotation', resolved: false, author: 'claude',
     messages: [
       { id: 'm1', author: 'claude', text: 'Original annotation', createdAt: '2026-09-05T09:00:00Z' },
       { id: 'm2', author: 'user', text: 'First reply', createdAt: '2026-09-05T09:01:00Z' },
@@ -105,7 +105,7 @@ test('open mode exposes reply, retry, resolve, and close actions', () => {
 
 test('compact action tooltips are associated and appear on focus or hover, including disabled Resolve', () => {
   const tree = create(createElement(AnnotationThread, {
-    comment: { id: 'c1', type: 'abstract', text: 'Needs evidence', resolved: false, author: 'claude' },
+    comment: { id: 'c1', type: 'telling', text: 'Needs evidence', resolved: false, author: 'claude' },
     mode: 'open', disabled: true, onResolve: vi.fn(), onClose: vi.fn(),
   }))
 
@@ -120,7 +120,7 @@ test('compact action tooltips are associated and appear on focus or hover, inclu
   expect(resolve.props.disabled).toBe(true)
   expect(resolve.props['aria-describedby']).toBe(resolveTooltip.props.id)
   expect(close.props['aria-describedby']).toBe(closeTooltip.props.id)
-  expect(resolveTooltip.children.join('')).toBe('Resolve Abstract comment')
+  expect(resolveTooltip.children.join('')).toBe('Resolve Telling comment')
   expect(closeTooltip.children.join('')).toBe('Close annotation thread')
   expect(resolveTooltip.props['data-state']).toBe('closed')
 
@@ -153,7 +153,7 @@ test('compact action tooltips are associated and appear on focus or hover, inclu
 test('thread header shows its typed icon and actions while messages retain author provenance', () => {
   const tree = create(createElement(AnnotationThread, {
     comment: {
-      id: 'c1', type: 'abstract', text: 'Opening note', resolved: false, author: 'claude',
+      id: 'c1', type: 'telling', text: 'Opening note', resolved: false, author: 'claude',
       messages: [
         { id: 'claude-1', author: 'claude', text: 'Opening note', createdAt: '2026-08-30T09:00:00Z' },
         { id: 'user-1', author: 'user', text: 'A reply', createdAt: '2026-08-30T09:01:00Z' },
@@ -166,9 +166,9 @@ test('thread header shows its typed icon and actions while messages retain autho
 
   const header = tree.root.findByProps({ className: 'elves-annotation-thread__header' })
   const type = header.findByProps({ className: 'elves-annotation-thread__type' })
-  expect(type.props['data-type']).toBe('abstract')
+  expect(type.props['data-type']).toBe('telling')
   expect(type.findAllByType('svg')).toHaveLength(1)
-  expect(type.children.filter((child) => typeof child === 'string').join('')).toBe('Abstract')
+  expect(type.children.filter((child) => typeof child === 'string').join('')).toBe('Telling')
   expect(header.findAllByProps({ className: 'elves-annotation-thread__message-author' })).toHaveLength(0)
   expect(header.findAll((node) => node.children.some((child) => typeof child === 'string' && child.trim() === 'Claude')))
     .toHaveLength(0)
@@ -440,7 +440,7 @@ test('a targeted pin clears its temporary preview after pointer or focus leaves'
   vi.useFakeTimers()
   const target = { kind: 'feedback' as const, feedbackId: 'shape:feedback' }
   const tree = create(createElement(AnnotationPin, {
-    comment: { id: 'feedback', type: 'told', text: 'Name the causal bridge.', resolved: false, author: 'claude' },
+    comment: { id: 'feedback', type: 'stakes', text: 'Name the causal bridge.', resolved: false, author: 'claude' },
     target,
   }))
 
@@ -520,7 +520,7 @@ test('a pin name includes a bounded gist of the annotation text', () => {
 })
 
 test('each annotation pin renders one decorative SVG icon', () => {
-  const types = [null, 'abstract', 'told', 'unearned', 'false-note', 'slack', 'buried', 'so-what', 'unclear', 'tighten'] as const
+  const types = [null, 'telling', 'flat', 'stakes', 'dialogue', 'pov', 'info-dump', 'continuity', 'drag', 'unclear', 'tighten'] as const
 
   for (const type of types) {
     const tree = create(createElement(AnnotationPin, {
@@ -553,15 +553,16 @@ test('annotation pin icons use a centred fixed wrapper without a transform nudge
   expect(baseRule).toMatch(/border-color:\s*var\(--elves-cc-freeform-label\)/)
 
   const strongColourTypes = {
-    abstract: 'abstract',
-    told: 'told',
-    unearned: 'unearned',
-    'false-note': 'falsenote',
-    slack: 'slack',
-    buried: 'buried',
-    'so-what': 'sowhat',
-    tighten: 'tighten',
+    telling: 'telling',
+    flat: 'flat',
+    stakes: 'stakes',
+    dialogue: 'dialogue',
+    pov: 'pov',
+    'info-dump': 'infodump',
+    continuity: 'continuity',
+    drag: 'drag',
     unclear: 'unclear',
+    tighten: 'tighten',
   } as const
   for (const [type, token] of Object.entries(strongColourTypes)) {
     const typeRule = ruleFor(`\\.elves-annotation-pin\\[data-type="${type}"\\]`)
@@ -578,7 +579,7 @@ test('thread controls use the embedded composer and typed header layout', () => 
   expect(css).toMatch(/\.elves-annotation-thread__header\s*\{[^}]*justify-content:\s*space-between/s)
   expect(css).toMatch(/\.elves-annotation-thread__type\s*\{[^}]*font-size:\s*12px/s)
   expect(css).toMatch(/\.elves-annotation-thread__type\s*\{[^}]*font-weight:\s*700/s)
-  expect(css).toMatch(/\.elves-annotation-thread__type\[data-type="abstract"\]\s*\{[^}]*color:\s*var\(--elves-cc-abstract-label\)/s)
+  expect(css).toMatch(/\.elves-annotation-thread__type\[data-type="telling"\]\s*\{[^}]*color:\s*var\(--elves-cc-telling-label\)/s)
   expect(css).toMatch(/\.elves-annotation-thread__error\s*\{[^}]*display:\s*flex/s)
   expect(css).toMatch(/\.elves-annotation-thread__error\s*\{[^}]*border:\s*1px solid var\(--elves-danger/s)
   expect(css).toMatch(/\.elves-annotation-thread__error-message\s*\{[^}]*min-width:\s*0/s)

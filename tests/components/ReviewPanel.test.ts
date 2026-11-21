@@ -16,7 +16,7 @@ test('review panel has no resolved annotation stack', () => {
       type: 'card',
       props: {
         comments: [{
-          id: 'comment:resolved', type: 'so-what', text: 'This was addressed.',
+          id: 'comment:resolved', type: 'pov', text: 'This was addressed.',
           resolved: true, author: 'claude', messages: [],
         }],
       },

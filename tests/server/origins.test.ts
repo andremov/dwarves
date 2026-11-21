@@ -4,17 +4,17 @@ import { getAllowedOrigins, isOriginAllowed } from '../../server/origins'
 describe('getAllowedOrigins', () => {
   test('defaults to localhost/127.0.0.1 on the client dev port and the server port', () => {
     expect(getAllowedOrigins({})).toEqual([
-      'http://localhost:5273',
-      'http://127.0.0.1:5273',
-      'http://localhost:5299',
-      'http://127.0.0.1:5299',
+      'http://localhost:5373',
+      'http://127.0.0.1:5373',
+      'http://localhost:5399',
+      'http://127.0.0.1:5399',
     ])
   })
 
   test('uses PORT for the server-port entries when set', () => {
     expect(getAllowedOrigins({ PORT: '4000' })).toEqual([
-      'http://localhost:5273',
-      'http://127.0.0.1:5273',
+      'http://localhost:5373',
+      'http://127.0.0.1:5373',
       'http://localhost:4000',
       'http://127.0.0.1:4000',
     ])
@@ -29,7 +29,7 @@ describe('getAllowedOrigins', () => {
 })
 
 describe('isOriginAllowed', () => {
-  const allowed = ['http://localhost:5273']
+  const allowed = ['http://localhost:5373']
 
   test('a missing Origin (same-origin, curl, server-to-server) is always allowed', () => {
     expect(isOriginAllowed(undefined, allowed)).toBe(true)
@@ -38,7 +38,7 @@ describe('isOriginAllowed', () => {
   })
 
   test('a listed origin is allowed', () => {
-    expect(isOriginAllowed('http://localhost:5273', allowed)).toBe(true)
+    expect(isOriginAllowed('http://localhost:5373', allowed)).toBe(true)
   })
 
   test('an unlisted origin is rejected', () => {

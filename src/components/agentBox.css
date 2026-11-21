@@ -225,11 +225,11 @@
 
 /* Error run: red indicator + label, no pulse. */
 .elves-agentbox--collapsed[data-phase='error'] .elves-agentbox__cdot {
-  background: var(--elves-cc-abstract-label, #b4472a);
+  background: var(--elves-cc-stakes-label, #b4472a);
   animation: none;
 }
 .elves-agentbox--collapsed[data-phase='error'] .elves-agentbox__cverb {
-  color: var(--elves-cc-abstract-label, #b4472a);
+  color: var(--elves-cc-stakes-label, #b4472a);
 }
 
 /* A run finishing while collapsed fires a one-shot ring so it's noticeable
@@ -323,9 +323,9 @@
   font-size: 13px;
   font-weight: 600;
   line-height: 1.45;
-  color: var(--elves-cc-abstract-label, #b4472a);
-  background: color-mix(in srgb, var(--elves-cc-abstract-label, #b4472a) 9%, var(--elves-surface));
-  border: 1px solid color-mix(in srgb, var(--elves-cc-abstract-label, #b4472a) 35%, var(--elves-border-subtle));
+  color: var(--elves-cc-stakes-label, #b4472a);
+  background: color-mix(in srgb, var(--elves-cc-stakes-label, #b4472a) 9%, var(--elves-surface));
+  border: 1px solid color-mix(in srgb, var(--elves-cc-stakes-label, #b4472a) 35%, var(--elves-border-subtle));
   border-radius: 7px;
 }
 

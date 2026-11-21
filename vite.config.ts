@@ -19,7 +19,7 @@ const installRoot = dirname(dirname(dirname(require.resolve('vite/package.json')
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 5273,
+    port: 5373,
     fs: { allow: [projectRoot, installRoot] },
   },
 })

@@ -69,7 +69,7 @@
   --elves-highlight: inset 0 1px 0 oklch(1 0 0 / 0.65);
 
   /* ---- Claude-authorship accent — warm orange, distinct from the muted
-     told comment tone, so a Claude-written section label reads
+     telling comment tone, so a Claude-written section label reads
      unambiguously against the cream background. ---- */
   --elves-claude-accent: oklch(0.62 0.17 45);
 
@@ -98,56 +98,55 @@
      readable label colour, a very light tinted background, and a subtle tinted
      border.
 
-     The nine types walk the hue wheel so no two adjacent-in-meaning notes look
-     alike at a glance: the two "you skipped the real thing" faults sit in the
-     warm reds (abstract = red, told = orange), freeform stays yellow, the one
-     note that is a FIND rather than a fault is green (buried), the reader-side
-     signals are teal/blue (unclear, tighten), and the three judgement calls
-     climb into the cools and rose (slack = indigo, so-what = purple,
-     false-note = violet, unearned = rose). ---- */
+     The ten types walk the hue wheel: the two "the scene isn't working" faults
+     sit in the warm reds (stakes = red, telling = orange), freeform stays
+     yellow, the page-level faults run through the greens and teal (info-dump,
+     flat, dialogue), the reader signals are blue (unclear, tighten), and the
+     craft-mechanics notes climb into the cools and rose (drag = indigo,
+     pov = violet, continuity = rose). ---- */
   --elves-cc-freeform-label:  oklch(0.560 0.070 92);
   --elves-cc-freeform-bg:     oklch(0.968 0.024 92);
   --elves-cc-freeform-border: oklch(0.895 0.040 92);
 
-  /* abstract = red: the cardinal sin of the genre, so it carries the strongest
-     warning hue. */
-  --elves-cc-abstract-label:  oklch(0.560 0.100 30);
-  --elves-cc-abstract-bg:     oklch(0.965 0.028 30);
-  --elves-cc-abstract-border: oklch(0.888 0.045 30);
+  --elves-cc-stakes-label:  oklch(0.560 0.100 30);
+  --elves-cc-stakes-bg:     oklch(0.965 0.028 30);
+  --elves-cc-stakes-border: oklch(0.888 0.045 30);
 
-  --elves-cc-told-label:  oklch(0.585 0.095 58);
-  --elves-cc-told-bg:     oklch(0.966 0.030 58);
-  --elves-cc-told-border: oklch(0.890 0.048 58);
+  --elves-cc-telling-label:  oklch(0.585 0.095 58);
+  --elves-cc-telling-bg:     oklch(0.966 0.030 58);
+  --elves-cc-telling-border: oklch(0.890 0.048 58);
 
-  /* buried = green: the only note that tells the writer they did something
-     RIGHT and hid it. Deliberately not a warning colour. */
-  --elves-cc-buried-label:  oklch(0.520 0.060 152);
-  --elves-cc-buried-bg:     oklch(0.966 0.022 152);
-  --elves-cc-buried-border: oklch(0.892 0.034 152);
+  --elves-cc-infodump-label:  oklch(0.545 0.090 130);
+  --elves-cc-infodump-bg:     oklch(0.966 0.026 130);
+  --elves-cc-infodump-border: oklch(0.891 0.042 130);
 
-  --elves-cc-unclear-label:  oklch(0.530 0.070 185);
-  --elves-cc-unclear-bg:     oklch(0.966 0.022 185);
-  --elves-cc-unclear-border: oklch(0.892 0.034 185);
+  --elves-cc-flat-label:  oklch(0.545 0.090 160);
+  --elves-cc-flat-bg:     oklch(0.966 0.026 160);
+  --elves-cc-flat-border: oklch(0.891 0.042 160);
 
-  --elves-cc-tighten-label:  oklch(0.545 0.085 210);
-  --elves-cc-tighten-bg:     oklch(0.966 0.022 210);
-  --elves-cc-tighten-border: oklch(0.892 0.038 210);
+  --elves-cc-dialogue-label:  oklch(0.545 0.090 190);
+  --elves-cc-dialogue-bg:     oklch(0.966 0.026 190);
+  --elves-cc-dialogue-border: oklch(0.891 0.042 190);
 
-  --elves-cc-slack-label:  oklch(0.545 0.085 235);
-  --elves-cc-slack-bg:     oklch(0.966 0.022 235);
-  --elves-cc-slack-border: oklch(0.892 0.038 235);
+  --elves-cc-unclear-label:  oklch(0.545 0.090 215);
+  --elves-cc-unclear-bg:     oklch(0.966 0.026 215);
+  --elves-cc-unclear-border: oklch(0.891 0.042 215);
 
-  --elves-cc-sowhat-label:  oklch(0.530 0.095 270);
-  --elves-cc-sowhat-bg:     oklch(0.966 0.026 270);
-  --elves-cc-sowhat-border: oklch(0.892 0.042 270);
+  --elves-cc-tighten-label:  oklch(0.545 0.090 240);
+  --elves-cc-tighten-bg:     oklch(0.966 0.026 240);
+  --elves-cc-tighten-border: oklch(0.891 0.042 240);
 
-  --elves-cc-falsenote-label:  oklch(0.520 0.110 300);
-  --elves-cc-falsenote-bg:     oklch(0.966 0.030 300);
-  --elves-cc-falsenote-border: oklch(0.892 0.048 300);
+  --elves-cc-drag-label:  oklch(0.545 0.090 270);
+  --elves-cc-drag-bg:     oklch(0.966 0.026 270);
+  --elves-cc-drag-border: oklch(0.891 0.042 270);
 
-  --elves-cc-unearned-label:  oklch(0.560 0.105 355);
-  --elves-cc-unearned-bg:     oklch(0.966 0.026 355);
-  --elves-cc-unearned-border: oklch(0.890 0.044 355);
+  --elves-cc-pov-label:  oklch(0.545 0.090 300);
+  --elves-cc-pov-bg:     oklch(0.966 0.026 300);
+  --elves-cc-pov-border: oklch(0.891 0.042 300);
+
+  --elves-cc-continuity-label:  oklch(0.545 0.090 340);
+  --elves-cc-continuity-bg:     oklch(0.966 0.026 340);
+  --elves-cc-continuity-border: oklch(0.891 0.042 340);
 
   /* Figure card sketch-frame: a soft ink dash for a human-planned figure. A
      Claude-suggested figure tints its frame with the warm authorship accent

@@ -7,12 +7,12 @@
  * and the server's own port are allowed, so a page open in any other tab (or
  * any other device on the LAN) cannot read or write the canvas. Set
  * `ELVES_ALLOWED_ORIGINS` (comma-separated, e.g.
- * "http://localhost:5273,https://my-tunnel.example") to explicitly widen
+ * "http://localhost:5373,https://my-tunnel.example") to explicitly widen
  * this — for example when accessing the app through a tunnel or a
  * non-default port.
  */
 
-const DEFAULT_CLIENT_DEV_PORT = 5273
+const DEFAULT_CLIENT_DEV_PORT = 5373
 
 export function getAllowedOrigins(env: NodeJS.ProcessEnv = process.env): string[] {
   const fromEnv = (env.ELVES_ALLOWED_ORIGINS ?? '')
@@ -21,7 +21,7 @@ export function getAllowedOrigins(env: NodeJS.ProcessEnv = process.env): string[
     .filter(Boolean)
   if (fromEnv.length) return fromEnv
 
-  const serverPort = Number(env.PORT ?? 5299)
+  const serverPort = Number(env.PORT ?? 5399)
   return [
     `http://localhost:${DEFAULT_CLIENT_DEV_PORT}`,
     `http://127.0.0.1:${DEFAULT_CLIENT_DEV_PORT}`,

@@ -838,9 +838,9 @@ test('unfurl cancels an image body at the deadline and keeps its asset null', as
 
 test('the allowed client dev origin gets Access-Control-Allow-Origin echoed back', async () => {
   const app = await appWithTmp()
-  const res = await request(app).get('/projects').set('Origin', 'http://localhost:5273')
+  const res = await request(app).get('/projects').set('Origin', 'http://localhost:5373')
   expect(res.status).toBe(200)
-  expect(res.headers['access-control-allow-origin']).toBe('http://localhost:5273')
+  expect(res.headers['access-control-allow-origin']).toBe('http://localhost:5373')
 })
 
 test('a request with no Origin header (supertest default) still works', async () => {

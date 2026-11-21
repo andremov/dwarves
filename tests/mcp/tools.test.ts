@@ -118,13 +118,13 @@ test('addCommentTool posts a change-set the server broadcasts tagged with the pr
   const received = new Promise<any>((res) => ws.on('message', (d) => res(JSON.parse(d.toString()))))
   await new Promise<void>((r) => ws.on('open', () => r()))
 
-  await addCommentTool(base, 'essay', { cardId: 'shape:a', text: 'no source', type: 'abstract' })
+  await addCommentTool(base, 'essay', { cardId: 'shape:a', text: 'no source', type: 'telling' })
 
   const { projectId, changeSet } = await received
   expect(projectId).toBe('essay')
   expect(changeSet.author).toBe('claude')
   expect(changeSet.ops).toEqual([
-    { kind: 'add_comment', cardId: 'shape:a', comment: { type: 'abstract', text: 'no source', reviewId: null } },
+    { kind: 'add_comment', cardId: 'shape:a', comment: { type: 'telling', text: 'no source', reviewId: null } },
   ])
   ws.close()
 })
@@ -137,12 +137,12 @@ test('addCommentTool posts comment.reviewId when given one, tagging the comment 
   await new Promise<void>((r) => ws.on('open', () => r()))
 
   await addCommentTool(base, 'essay', {
-    cardId: 'shape:a', text: 'the strongest objection is unanswered', type: 'unearned', reviewId: 'rev-1',
+    cardId: 'shape:a', text: 'the strongest objection is unanswered', type: 'flat', reviewId: 'rev-1',
   })
 
   const { changeSet } = await received
   expect(changeSet.ops).toEqual([
-    { kind: 'add_comment', cardId: 'shape:a', comment: { type: 'unearned', text: 'the strongest objection is unanswered', reviewId: 'rev-1' } },
+    { kind: 'add_comment', cardId: 'shape:a', comment: { type: 'flat', text: 'the strongest objection is unanswered', reviewId: 'rev-1' } },
   ])
   ws.close()
 })
@@ -179,13 +179,13 @@ test('startReviewTool ad-hoc: posts personality+agent and returns instructions w
 
 test('startReviewTool with reviewId claims a pending review, then re-returns the brief without re-claiming', async () => {
   const { base } = await liveElves()
-  const reviewId = await seedPendingReview(base, 'landing', 'the ending')
+  const reviewId = await seedPendingReview(base, 'stakes', 'the ending')
 
   const first = await startReviewTool(base, 'essay', { reviewId })
   expect(first.reviewId).toBe(reviewId)
-  expect(first.personality).toBe('landing')
+  expect(first.personality).toBe('stakes')
   expect(first.focus).toBe('the ending')
-  expect(first.instructions).toContain(PERSONALITIES.landing.brief)
+  expect(first.instructions).toContain(PERSONALITIES.stakes.brief)
 
   const afterFirst = (await listReviewsTool(base, 'essay')).find((r) => r.id === reviewId)!
   expect(afterFirst.status).toBe('in-progress')
@@ -205,7 +205,7 @@ test('startReviewTool with reviewId claims a pending review, then re-returns the
 
 test('startReviewTool with reviewId re-claims a FAILED review (the retry path) and clears its error', async () => {
   const { base } = await liveElves()
-  const reviewId = await seedPendingReview(base, 'anti-sentimentalist')
+  const reviewId = await seedPendingReview(base, 'character')
   // Simulate an in-app run that died: fail the pending pass directly against
   // the same status endpoint the server's launchReviewRun completion handler
   // uses, the way it would after a spawned agent crashed before claiming.
@@ -223,7 +223,7 @@ test('startReviewTool with reviewId re-claims a FAILED review (the retry path) a
   // must not linger on a review that's actively running again.
   const started = await startReviewTool(base, 'essay', { reviewId })
   expect(started.reviewId).toBe(reviewId)
-  expect(started.personality).toBe('anti-sentimentalist')
+  expect(started.personality).toBe('character')
 
   const reclaimed = (await listReviewsTool(base, 'essay')).find((r) => r.id === reviewId)!
   expect(reclaimed.status).toBe('in-progress')
@@ -238,7 +238,7 @@ test('startReviewTool without a reviewId or personality rejects with a helpful e
 
 test('completeReviewTool posts status done with the given verdict and stamps commentCount', async () => {
   const { base } = await liveElves()
-  const started = await startReviewTool(base, 'essay', { personality: 'anti-sentimentalist' })
+  const started = await startReviewTool(base, 'essay', { personality: 'character' })
 
   const review = await completeReviewTool(base, 'essay', { reviewId: started.reviewId, verdict: 'the receipts check out' })
 
@@ -271,18 +271,18 @@ test('floating feedback can be created and explicitly resolved through the share
     text: 'The middle needs a bridge',
     x: -100,
     y: 20,
-    type: 'so-what',
+    type: 'pov',
     reviewId: 'review-a',
-    reviewer: 'landing',
+    reviewer: 'stakes',
   })
   const created = await readMapTool(base, 'essay')
   expect(created.feedback).toHaveLength(1)
   expect(created.feedback[0]).toMatchObject({
     text: 'The middle needs a bridge',
     authoredBy: 'claude',
-    type: 'so-what',
+    type: 'pov',
     reviewId: 'review-a',
-    reviewer: 'landing',
+    reviewer: 'stakes',
     resolved: false,
   })
 

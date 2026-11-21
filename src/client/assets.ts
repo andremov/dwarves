@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef } from 'react'
 import { atom } from 'tldraw'
 
-const BASE = (import.meta as any).env?.VITE_SERVER_URL ?? 'http://localhost:5299'
+const BASE = (import.meta as any).env?.VITE_SERVER_URL ?? 'http://localhost:5399'
 
 // Elves shows one project at a time. assetUrl() is called deep inside the tldraw
 // shape renderer where threading the project id as a prop is awkward. A tldraw

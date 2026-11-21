@@ -1,6 +1,6 @@
 import type { AgentConversationMessage, AgentEvent } from '../../server/agentRun'
 
-const BASE = (import.meta as any).env?.VITE_SERVER_URL ?? 'http://localhost:5299'
+const BASE = (import.meta as any).env?.VITE_SERVER_URL ?? 'http://localhost:5399'
 
 export type { AgentEvent }
 

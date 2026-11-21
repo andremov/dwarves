@@ -4,8 +4,8 @@ export const PIN_GAP = 8
 export const PIN_SIZE = 28
 
 export type AnnotationPinIcon =
-  | 'comment' | 'warning' | 'chart-down' | 'link' | 'image'
-  | 'arrows' | 'scissors' | 'question' | 'buildings'
+  | 'comment' | 'slate' | 'person' | 'fire' | 'chats'
+  | 'eye' | 'stack' | 'history' | 'hourglass' | 'question' | 'scissors'
 
 export type AnnotationPin = {
   icon: AnnotationPinIcon
@@ -19,13 +19,14 @@ export type CardAnnotationPin = {
 }
 
 const PIN_TOKENS: Record<CommentType | 'freeform', AnnotationPin> = {
-  abstract: { icon: 'warning', tone: 'abstract', label: 'Abstract' },
-  told: { icon: 'image', tone: 'told', label: 'Told' },
-  unearned: { icon: 'chart-down', tone: 'unearned', label: 'Unearned' },
-  'false-note': { icon: 'arrows', tone: 'false-note', label: 'False note' },
-  slack: { icon: 'scissors', tone: 'slack', label: 'Slack' },
-  buried: { icon: 'link', tone: 'buried', label: 'Buried' },
-  'so-what': { icon: 'buildings', tone: 'so-what', label: 'So what' },
+  telling: { icon: 'slate', tone: 'telling', label: 'Telling' },
+  flat: { icon: 'person', tone: 'flat', label: 'Flat' },
+  stakes: { icon: 'fire', tone: 'stakes', label: 'Stakes' },
+  dialogue: { icon: 'chats', tone: 'dialogue', label: 'Dialogue' },
+  pov: { icon: 'eye', tone: 'pov', label: 'Point of view' },
+  'info-dump': { icon: 'stack', tone: 'info-dump', label: 'Info-dump' },
+  continuity: { icon: 'history', tone: 'continuity', label: 'Continuity' },
+  drag: { icon: 'hourglass', tone: 'drag', label: 'Drag' },
   unclear: { icon: 'question', tone: 'unclear', label: 'Unclear' },
   tighten: { icon: 'scissors', tone: 'tighten', label: 'Tighten' },
   freeform: { icon: 'comment', tone: 'freeform', label: 'Comment' },

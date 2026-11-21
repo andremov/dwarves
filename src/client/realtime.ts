@@ -3,7 +3,7 @@ import { PresenceMessage } from '../model/presence'
 import { Review } from '../model/reviews'
 
 const BASE =
-  (import.meta as any).env?.VITE_SERVER_URL ?? 'http://localhost:5299'
+  (import.meta as any).env?.VITE_SERVER_URL ?? 'http://localhost:5399'
 
 export type RealtimeStatus = 'connecting' | 'connected' | 'reconnecting' | 'disconnected'
 

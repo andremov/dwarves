@@ -4,10 +4,10 @@ import { FEEDBACK_DEFAULT_H, FEEDBACK_DEFAULT_W, feedbackIsHidden, makeFeedbackP
 describe('floating feedback props', () => {
   test('preserves agent and review provenance while starting active', () => {
     expect(makeFeedbackProps('The middle needs a bridge', 'claude', {
-      type: 'so-what', reviewId: 'rev-1', reviewer: 'landing',
+      type: 'pov', reviewId: 'rev-1', reviewer: 'stakes',
     })).toMatchObject({
-      text: 'The middle needs a bridge', authoredBy: 'claude', type: 'so-what',
-      reviewId: 'rev-1', reviewer: 'landing', resolved: false,
+      text: 'The middle needs a bridge', authoredBy: 'claude', type: 'pov',
+      reviewId: 'rev-1', reviewer: 'stakes', resolved: false,
     })
   })
 

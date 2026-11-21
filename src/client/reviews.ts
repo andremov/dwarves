@@ -1,6 +1,6 @@
 import { isReview, type Review, type PersonalityId, type ReviewStatus } from '../model/reviews'
 
-const BASE = (import.meta as any).env?.VITE_SERVER_URL ?? 'http://localhost:5299'
+const BASE = (import.meta as any).env?.VITE_SERVER_URL ?? 'http://localhost:5399'
 
 export async function fetchReviews(projectId: string): Promise<Review[]> {
   const res = await fetch(`${BASE}/projects/${encodeURIComponent(projectId)}/reviews`)

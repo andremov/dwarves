@@ -1,7 +1,7 @@
 import { useEffect, useId, useLayoutEffect, useRef, useState, type CSSProperties, type FormEvent, type MouseEvent, type ReactNode } from 'react'
 import {
-  ArrowBendUpLeft, ArrowsLeftRight, Buildings, ChartLineDown, ChatCircleDots, Check, ImageSquare,
-  Link, PaperPlaneRight, Question, Scissors, Warning, X,
+  ArrowBendUpLeft, ChatCircleDots, ChatsCircle, Check, ClockCounterClockwise, Eye, FilmSlate, Fire,
+  Hourglass, PaperPlaneRight, Question, Scissors, Stack, UserCircle, Warning, X,
 } from '@phosphor-icons/react'
 import { authorInfo } from '../shapes/agents'
 import { annotationPin, PIN_SIZE, type AnnotationPinIcon } from '../model/annotationPins'
@@ -326,16 +326,18 @@ function ActionTooltip({ label, children }: { label: string; children: (tooltipI
   )
 }
 
-const PIN_ICONS: Record<AnnotationPinIcon, typeof Warning> = {
+const PIN_ICONS: Record<AnnotationPinIcon, typeof Question> = {
   comment: ChatCircleDots,
-  warning: Warning,
-  'chart-down': ChartLineDown,
-  link: Link,
-  image: ImageSquare,
-  arrows: ArrowsLeftRight,
-  scissors: Scissors,
+  slate: FilmSlate,
+  person: UserCircle,
+  fire: Fire,
+  chats: ChatsCircle,
+  eye: Eye,
+  stack: Stack,
+  history: ClockCounterClockwise,
+  hourglass: Hourglass,
   question: Question,
-  buildings: Buildings,
+  scissors: Scissors,
 }
 
 export interface AnnotationPinProps {

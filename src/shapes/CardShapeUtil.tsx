@@ -396,8 +396,8 @@ export class CardShapeUtil extends ShapeUtil<CardShape> {
       T.object({
         id: T.string,
         type: T.nullable(T.literalEnum(
-          'abstract', 'told', 'unearned', 'false-note',
-          'slack', 'buried', 'so-what', 'unclear', 'tighten',
+          'telling', 'flat', 'stakes', 'dialogue', 'pov',
+          'info-dump', 'continuity', 'drag', 'unclear', 'tighten',
         )),
         text: T.string,
         resolved: T.boolean,

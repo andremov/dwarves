@@ -139,7 +139,7 @@ test('overlapping review requests keep project transitions locked until both set
 test('summon and dismiss stay locked through lost responses and failed refresh', async ({ page }) => {
   const review = {
     id: '',
-    personality: 'landing',
+    personality: 'stakes',
     status: 'pending',
     focus: null,
     requestedAt: '2026-07-14T12:00:00.000Z',
@@ -181,16 +181,16 @@ test('summon and dismiss stay locked through lost responses and failed refresh',
   await page.goto('/')
   await expect(page.getByTestId('new-prose')).toBeEnabled()
   await page.getByTestId('review-button').click()
-  await page.getByTestId('review-summon-landing').click()
+  await page.getByTestId('review-summon-stakes').click()
 
-  const pass = page.getByTestId('review-pass-landing')
+  const pass = page.getByTestId('review-pass-stakes')
   await expect.poll(() => summonBodies.length).toBe(1)
   await expect(page.getByTestId('project-switcher')).toBeDisabled()
   await expect(pass).toHaveAttribute('data-status', 'pending')
   expect(summonBodies[1]).toEqual(summonBodies[0])
   await expect(page.getByTestId('project-switcher')).toBeDisabled()
 
-  await page.getByTestId('review-dismiss-landing').click()
+  await page.getByTestId('review-dismiss-stakes').click()
   await expect.poll(() => dismissBodies.length).toBe(1)
   await expect(page.getByTestId('project-switcher')).toBeDisabled()
   await expect(pass).toHaveCount(0)

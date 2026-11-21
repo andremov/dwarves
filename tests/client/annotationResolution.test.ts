@@ -35,7 +35,7 @@ test('targeted card Undo changes only resolved and preserves later replies and u
     'shape:card': {
       id: 'shape:card', type: 'card', x: 10,
       props: { comments: [{
-        id: 'comment:one', type: 'so-what', text: 'Original', resolved: false,
+        id: 'comment:one', type: 'pov', text: 'Original', resolved: false,
         author: 'claude', reviewId: null, messages: [{ id: 'initial', author: 'claude', text: 'Original', createdAt: '' }],
       }] },
     },
@@ -66,7 +66,7 @@ test('Undo safely no-ops when a target is deleted or superseded and never recrea
   const records: Record<string, any> = {
     'shape:feedback': {
       id: 'shape:feedback', type: 'feedback',
-      props: { type: 'told', text: 'Original', authoredBy: 'claude', reviewId: null, reviewer: 'landing', resolved: false, messages: [] },
+      props: { type: 'stakes', text: 'Original', authoredBy: 'claude', reviewId: null, reviewer: 'stakes', resolved: false, messages: [] },
     },
   }
   const { editor, updateShape } = editorWith(records)

@@ -36,7 +36,7 @@ test('a WebSocket connection with a disallowed Origin is rejected', async () => 
 
 test('a WebSocket connection with an allowed Origin is accepted', async () => {
   const { port } = await startServer()
-  const ws = new WebSocket(`ws://127.0.0.1:${port}/ws`, { headers: { Origin: 'http://localhost:5273' } })
+  const ws = new WebSocket(`ws://127.0.0.1:${port}/ws`, { headers: { Origin: 'http://localhost:5373' } })
   const outcome = await new Promise<'open' | 'error-or-close'>((resolve) => {
     ws.on('open', () => resolve('open'))
     ws.on('error', () => resolve('error-or-close'))

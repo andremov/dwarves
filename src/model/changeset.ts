@@ -152,8 +152,8 @@ export function changeSetTokenStamp(token: { epoch: string; sequence: number }):
 }
 
 const COMMENT_TYPES: readonly (CommentType | null)[] = [
-  'abstract', 'told', 'unearned', 'false-note',
-  'slack', 'buried', 'so-what', 'unclear', 'tighten', null,
+  'telling', 'flat', 'stakes', 'dialogue', 'pov',
+  'info-dump', 'continuity', 'drag', 'unclear', 'tighten', null,
 ]
 
 function isOp(v: unknown): v is Op {

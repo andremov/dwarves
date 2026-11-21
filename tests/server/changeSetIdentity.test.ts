@@ -18,7 +18,7 @@ const reference = {
 const ALL_OPS: { [Kind in Op['kind']]: Extract<Op, { kind: Kind }> } = {
   add_comment: {
     kind: 'add_comment', cardId: 'card-a',
-    comment: { type: 'unearned', text: 'Comment', reviewId: 'review-a' },
+    comment: { type: 'flat', text: 'Comment', reviewId: 'review-a' },
   },
   merge_notes: { kind: 'merge_notes', cardIds: ['card-a', 'card-b'] },
   move_cards: {
@@ -39,7 +39,7 @@ const ALL_OPS: { [Kind in Op['kind']]: Extract<Op, { kind: Kind }> } = {
   },
   edit_section_text: { kind: 'edit_section_text', sectionId: 'section-a', text: 'Section' },
   create_question: { kind: 'create_question', text: 'Question?', x: 1, y: 2 },
-  create_feedback: { kind: 'create_feedback', text: 'Feedback', x: 1, y: 2, feedback: { type: 'so-what', reviewId: 'review-a', reviewer: 'landing' } },
+  create_feedback: { kind: 'create_feedback', text: 'Feedback', x: 1, y: 2, feedback: { type: 'pov', reviewId: 'review-a', reviewer: 'stakes' } },
   resolve_feedback: { kind: 'resolve_feedback', feedbackId: 'feedback-a' },
   append_annotation_message: {
     kind: 'append_annotation_message',
@@ -77,7 +77,7 @@ function leafPaths(value: unknown, path: Path = []): Path[] {
 
 function replacementFor(value: unknown, path: Path): unknown {
   const key = path.at(-1)
-  if (key === 'type') return 'abstract'
+  if (key === 'type') return 'telling'
   if (key === 'refType') return 'article'
   if (key === 'fetchedBy') return 'user'
   if (typeof value === 'string') return `${value}-changed`

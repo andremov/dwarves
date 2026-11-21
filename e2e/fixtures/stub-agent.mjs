@@ -92,12 +92,13 @@ async function main() {
   // Leave one tagged comment, if there's a card to hang it on. The comment
   // type must be one this personality's UI legend actually recognizes.
   const commentTypeByPersonality = {
-    specificity: 'abstract',
-    'cold-reader': 'unclear',
-    landing: 'so-what',
-    voice: 'false-note',
-    'anti-sentimentalist': 'told',
-    pacing: 'slack',
+    scene: 'telling',
+    character: 'flat',
+    dialogue: 'dialogue',
+    stakes: 'stakes',
+    continuity: 'continuity',
+    pacing: 'drag',
+    'first-reader': 'unclear',
   }
   const commentType = commentTypeByPersonality[review.personality] ?? 'tighten'
 

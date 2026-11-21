@@ -33,8 +33,8 @@ import {
 } from './tools'
 
 const COMMENT_TYPE = z.enum([
-  'abstract', 'told', 'unearned', 'false-note',
-  'slack', 'buried', 'so-what', 'unclear', 'tighten',
+  'telling', 'flat', 'stakes', 'dialogue', 'pov',
+  'info-dump', 'continuity', 'drag', 'unclear', 'tighten',
 ])
 const PERSONALITY = z.enum(PERSONALITY_IDS as [PersonalityId, ...PersonalityId[]])
 const REF_TYPE = z.enum(['paper', 'article', 'book', 'software', 'social', 'video', 'wiki', 'link'])
@@ -66,7 +66,7 @@ The one house rule, non-negotiable: ONE SENTENCE. Every comment, question, and f
 
 Be sparing as well as brief: a few pointed notes beat a dozen, and one precise question beats five vague ones. You annotate and suggest; you never write the user's prose for them.
 
-The user can also summon a REVIEW PASS — a bounded, in-character editorial read by one of six goblins (The Specificity Goblin, The Cold Reader, The Landing, The Voice Goblin, The Anti-Sentimentalist, The Pacing Goblin). When you start work on a canvas, check list_reviews: a pending review is the user's summons waiting for you — claim it with start_review and follow the brief it returns. If the user asks for that kind of read in chat ("play devil's advocate on this"), open the pass with start_review(personality) instead of free-styling, so their review panel shows the pass and groups your notes.
+The user can also summon a REVIEW PASS — a bounded, in-character editorial read by one of seven dwarves (The Scene Dwarf, The Character Dwarf, The Dialogue Dwarf, The Stakes Dwarf, The Continuity Dwarf, The Pacing Dwarf, The First Reader). When you start work on a canvas, check list_reviews: a pending review is the user's summons waiting for you — claim it with start_review and follow the brief it returns. If the user asks for that kind of read in chat ("play devil's advocate on this"), open the pass with start_review(personality) instead of free-styling, so their review panel shows the pass and groups your notes.
 
 ${HOUSE_STYLE_BRIEF}`
 
@@ -208,7 +208,7 @@ export function createMcpServer(baseUrl: string): McpServer {
 
   server.tool(
     'add_comment',
-    "Attach a comment to a card in a project. Use a typed comment to flag a weakness in the user's PROSE. The types name the failure modes of reflective and opinion writing: `abstract` (generality where a concrete particular belongs), `told` (the feeling named instead of rendered), `unearned` (a beat or conclusion the piece hasn't paid for), `false-note` (the voice slips into someone else's register), `slack` (throat-clearing, circling, a sagging middle), `buried` (the best line or the real ending hidden mid-paragraph), `so-what` (the reflection never turns or arrives), `unclear` (a cold reader loses the thread), `tighten` (many words for few). Omit type for a freeform note. ONE sentence — two only if truly necessary, never more. Reply with only the note itself: no preamble, no hedging. Pass reviewId during a review pass so the panel can group its notes. You never write or edit card text — only comments. (To drop an actual figure placeholder on the canvas, use create_figure_card.)",
+    "Attach a comment to a card in a project. Use a typed comment to flag a weakness in the user's PROSE. The types name the failure modes of fiction: `telling` (a moment summarized or explained that should be dramatized), `flat` (a character with no want, or acting only because the plot needs it), `stakes` (nothing wanted, opposed, or at risk), `dialogue` (on-the-nose, expository, or indistinct speech), `pov` (a point-of-view slip), `info-dump` (backstory or worldbuilding that stalls the scene), `continuity` (contradicts something the story established), `drag` (the story stalls, repeats, or holds a beat too long), `unclear` (a new reader loses who, where, or when), `tighten` (many words for few). Omit type for a freeform note. ONE sentence — two only if truly necessary, never more. Reply with only the note itself: no preamble, no hedging. Pass reviewId during a review pass so the panel can group its notes. You never write or edit card text — only comments. (To drop an actual figure placeholder on the canvas, use create_figure_card.)",
     {
       project: PROJECT,
       cardId: z.string(),
@@ -230,7 +230,7 @@ export function createMcpServer(baseUrl: string): McpServer {
 
   server.tool(
     'list_reviews',
-    "List a project's REVIEW PASSES — bounded, in-character editorial reads by a summoned goblin (specificity | cold-reader | landing | voice | anti-sentimentalist | pacing). Returns each pass's id, personality, status (pending | in-progress | done | dismissed), focus (the user's optional scope note), agent, verdict, and commentCount. A PENDING review is the user's summons from the app waiting for an agent: when you start work on a canvas — or whenever the user asks 'any reviews waiting?' — check this and claim pending passes with start_review(reviewId). Never re-run a done pass unprompted, and treat a dismissed one as waved off.",
+    "List a project's REVIEW PASSES — bounded, in-character editorial reads by a summoned dwarf (scene | character | dialogue | stakes | continuity | pacing | first-reader). Returns each pass's id, personality, status (pending | in-progress | done | dismissed), focus (the user's optional scope note), agent, verdict, and commentCount. A PENDING review is the user's summons from the app waiting for an agent: when you start work on a canvas — or whenever the user asks 'any reviews waiting?' — check this and claim pending passes with start_review(reviewId). Never re-run a done pass unprompted, and treat a dismissed one as waved off.",
     { project: PROJECT },
     async ({ project }) => ({
       content: [{ type: 'text', text: JSON.stringify({ reviews: await listReviewsTool(baseUrl, project) }) }],
@@ -239,7 +239,7 @@ export function createMcpServer(baseUrl: string): McpServer {
 
   server.tool(
     'start_review',
-    "Open a REVIEW PASS and receive its working brief. Two ways in: pass `reviewId` to CLAIM a pending pass the user summoned from the app (from list_reviews — always check for one first), or pass `personality` to start an ad-hoc pass when the user asks for that kind of read in chat ('where did I go vague?', 'read it cold', 'does this land?', 'do I sound like myself here?', 'is this sentimental?', 'where does it drag?'). Never open an ad-hoc pass when a pending one of the same personality is waiting — claim it instead. Returns { reviewId, personality, focus, instructions }: follow the instructions exactly — read the whole canvas map and every scoped card first, stay in character, respect the annotation/question budgets, tag every annotation with the reviewId, then finish with complete_review. The six goblins: specificity (abstraction where a concrete detail belongs — asks the questions the detail would answer), cold-reader (a stranger's confusion on one pass), landing (whether the piece arrives, and where the real ending is buried), voice (register slips and borrowed cadence — never proposes wording), anti-sentimentalist (feeling that is told rather than rendered, or bigger than what was shown), pacing (throat-clearing, circling, the sagging middle).",
+    "Open a REVIEW PASS and receive its working brief. Two ways in: pass `reviewId` to CLAIM a pending pass the user summoned from the app (from list_reviews — always check for one first), or pass `personality` to start an ad-hoc pass when the user asks for that kind of read in chat ('am I telling instead of showing?', 'does she feel real?', 'does the dialogue work?', 'where is the tension?', 'any continuity errors?', 'where does it drag?', 'read it cold'). Never open an ad-hoc pass when a pending one of the same personality is waiting — claim it instead. Returns { reviewId, personality, focus, instructions }: follow the instructions exactly — read the whole canvas map and every scoped card first, stay in character, respect the annotation/question budgets, tag every annotation with the reviewId, then finish with complete_review. The seven dwarves: scene (summary and exposition where a dramatized scene belongs), character (people with no want, or acting only for the plot), dialogue (on-the-nose, expository, or indistinct speech — never proposes lines), stakes (scenes where nothing is wanted, opposed, or at risk), continuity (contradictions, timeline slips, and point-of-view breaks), pacing (slow openings, repeated beats, scenes that run long), first-reader (a stranger losing who, where, or when on one pass).",
     {
       project: PROJECT,
       reviewId: z.string().optional().describe('A pending review to claim, from list_reviews.'),
@@ -414,7 +414,7 @@ export function createMcpServer(baseUrl: string): McpServer {
 
   server.tool(
     'create_question',
-    "Drop a QUESTION card near a cluster — a short, pointed question the way a good editor asks (\"What did the room smell like?\", \"You assert X in three places but never argue it — which card is the argument?\"). It provokes what the user hasn't written yet; they answer by writing their OWN cards beside it, then dismiss it. A question card holds ONLY a question, never draft prose — that's the point, and it keeps you inside the \"only the user writes the final prose\" rule. It renders in your accent with your authorship mark. Guidance: ONE sentence per question, no preamble — just ask it, never more than one. FEW and SPECIFIC — at most ~5 per pass; anchored in what the cards actually say, not generic writing advice; concrete beats abstract. Check existing questions in read_map FIRST (open AND dismissed) — a dismissed question is one the user already answered or waved off, so don't re-ask it. x is narrative order like cards; place it beside the cluster it interrogates.",
+    "Drop a QUESTION card near a cluster — a short, pointed question the way a good editor asks (\"What does she want from him in this scene?\", \"You assert X in three places but never argue it — which card is the argument?\"). It provokes what the user hasn't written yet; they answer by writing their OWN cards beside it, then dismiss it. A question card holds ONLY a question, never draft prose — that's the point, and it keeps you inside the \"only the user writes the final prose\" rule. It renders in your accent with your authorship mark. Guidance: ONE sentence per question, no preamble — just ask it, never more than one. FEW and SPECIFIC — at most ~5 per pass; anchored in what the cards actually say, not generic writing advice; concrete beats abstract. Check existing questions in read_map FIRST (open AND dismissed) — a dismissed question is one the user already answered or waved off, so don't re-ask it. x is narrative order like cards; place it beside the cluster it interrogates.",
     { project: PROJECT, text: z.string(), x: z.number(), y: z.number() },
     async ({ project, text, x, y }) => {
       const gate = await styleGate([{ field: 'question', text }])
@@ -508,7 +508,7 @@ async function main() {
   // agents — an OpenAI model, an open-source model — can run the same server and
   // mark their own notes: set ELVES_AGENT=openai. Defaults to 'claude'.
   setAgentId(process.env.ELVES_AGENT ?? 'claude')
-  const server = createMcpServer(process.env.ELVES_URL ?? 'http://localhost:5299')
+  const server = createMcpServer(process.env.ELVES_URL ?? 'http://localhost:5399')
   await server.connect(new StdioServerTransport())
 }
 

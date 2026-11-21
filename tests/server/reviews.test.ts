@@ -51,7 +51,7 @@ test('createReview is born in-progress when an agent is given, and carries a foc
   const d = await tmpRoot()
   const path = reviewsPathFor(d, 'essay')!
   const review = await createReview(
-    path, { personality: 'landing', focus: 'the ending', agent: 'claude' }, '2026-07-08T10:00:00.000Z',
+    path, { personality: 'stakes', focus: 'the ending', agent: 'claude' }, '2026-07-08T10:00:00.000Z',
   )
   expect(review.status).toBe('in-progress')
   expect(review.agent).toBe('claude')
@@ -91,7 +91,7 @@ test('createReview rejects reuse of a stable id with different input', async () 
   }, '2026-07-08T00:00:00.000Z')
 
   await expect(createReview(path, {
-    id: 'rev-client-a', attemptId: 'attempt-a', personality: 'landing', focus: null,
+    id: 'rev-client-a', attemptId: 'attempt-a', personality: 'stakes', focus: null,
   }, '2026-07-08T00:01:00.000Z')).rejects.toMatchObject({ status: 409 })
 })
 
@@ -99,8 +99,8 @@ test('readReviews sorts newest-first by requestedAt', async () => {
   const d = await tmpRoot()
   const path = reviewsPathFor(d, 'essay')!
   const older = await createReview(path, { personality: 'pacing' }, '2026-07-01T00:00:00.000Z')
-  const newest = await createReview(path, { personality: 'landing' }, '2026-07-08T00:00:00.000Z')
-  const middle = await createReview(path, { personality: 'anti-sentimentalist' }, '2026-07-05T00:00:00.000Z')
+  const newest = await createReview(path, { personality: 'stakes' }, '2026-07-08T00:00:00.000Z')
+  const middle = await createReview(path, { personality: 'character' }, '2026-07-05T00:00:00.000Z')
   const reviews = await readReviews(path)
   expect(reviews.map((r) => r.id)).toEqual([newest.id, middle.id, older.id])
 })
@@ -177,7 +177,7 @@ test('transitionReview allows pending/in-progress → failed, stamping an error 
   expect(failed.status).toBe('failed')
   expect(failed.error).toBe('`claude` is not installed')
 
-  const inProgress = await createReview(path, { personality: 'landing', agent: 'claude' }, '2026-07-08T00:00:00.000Z')
+  const inProgress = await createReview(path, { personality: 'stakes', agent: 'claude' }, '2026-07-08T00:00:00.000Z')
   const failed2 = await transitionReview(path, inProgress.id, { status: 'failed' }, '2026-07-08T00:01:00.000Z')
   expect(failed2.status).toBe('failed')
   // No error given: a generic message, never a bare null, so the panel always has something to show.
@@ -242,13 +242,13 @@ test('transitionReview allows done → dismissed', async () => {
 test('transitionReview to done stamps commentCount from the canvas snapshot passed in', async () => {
   const d = await tmpRoot()
   const path = reviewsPathFor(d, 'essay')!
-  const review = await createReview(path, { personality: 'specificity', agent: 'claude' }, '2026-07-08T00:00:00.000Z')
+  const review = await createReview(path, { personality: 'scene', agent: 'claude' }, '2026-07-08T00:00:00.000Z')
   const snapshot: CanvasSnapshot = {
     document: {
       store: {
         'shape:a': mk('shape:a', 'x', [
-          { id: 'c1', type: 'unearned', text: 'note 1', resolved: false, author: 'claude', reviewId: review.id },
-          { id: 'c2', type: 'told', text: 'note 2', resolved: true, author: 'claude', reviewId: review.id },
+          { id: 'c1', type: 'flat', text: 'note 1', resolved: false, author: 'claude', reviewId: review.id },
+          { id: 'c2', type: 'stakes', text: 'note 2', resolved: true, author: 'claude', reviewId: review.id },
           { id: 'c3', type: null, text: 'unrelated', resolved: false, author: 'claude', reviewId: null },
         ]),
       },
@@ -314,9 +314,9 @@ test('POST /reviews without an agent is born pending; with an agent is born in-p
   expect(pending.status).toBe(200)
   expect(pending.body.review).toMatchObject({ personality: 'pacing', status: 'pending', agent: null })
 
-  const inProgress = await request(app).post('/projects/essay/reviews').send({ personality: 'landing', agent: 'claude' })
+  const inProgress = await request(app).post('/projects/essay/reviews').send({ personality: 'stakes', agent: 'claude' })
   expect(inProgress.status).toBe(200)
-  expect(inProgress.body.review).toMatchObject({ personality: 'landing', status: 'in-progress', agent: 'claude' })
+  expect(inProgress.body.review).toMatchObject({ personality: 'stakes', status: 'in-progress', agent: 'claude' })
   expect(typeof inProgress.body.review.startedAt).toBe('string')
 })
 
@@ -335,7 +335,7 @@ test('POST /reviews on an unknown project → 404', async () => {
 test('GET /reviews returns newest-first', async () => {
   const { app } = await appWithTmp()
   const first = await request(app).post('/projects/essay/reviews').send({ personality: 'pacing' })
-  const second = await request(app).post('/projects/essay/reviews').send({ personality: 'landing' })
+  const second = await request(app).post('/projects/essay/reviews').send({ personality: 'stakes' })
   const list = await request(app).get('/projects/essay/reviews')
   expect(list.body.reviews.map((r: any) => r.id)).toEqual([second.body.review.id, first.body.review.id])
 })
@@ -385,13 +385,13 @@ test('completing a review stamps commentCount by scanning the canvas for comment
   }
   await request(app).post('/projects/essay/canvas').send(snap)
 
-  const created = await request(app).post('/projects/essay/reviews').send({ personality: 'specificity', agent: 'claude' })
+  const created = await request(app).post('/projects/essay/reviews').send({ personality: 'scene', agent: 'claude' })
   const reviewId = created.body.review.id
 
   // Post an add_comment change-set tagged with this review's id onto the card.
   const cs = {
     id: 'cs-1', author: 'claude',
-    ops: [{ kind: 'add_comment', cardId: 'shape:a', comment: { type: 'unearned', text: 'the unanswered objection', reviewId } }],
+    ops: [{ kind: 'add_comment', cardId: 'shape:a', comment: { type: 'flat', text: 'the unanswered objection', reviewId } }],
   }
   const csRes = await request(app).post('/projects/essay/changeset').send(cs)
   expect(csRes.status).toBe(200)

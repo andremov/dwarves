@@ -224,7 +224,7 @@ test('desktop menus stay contained and scrollable in a short viewport', async ({
   expect(
     await reviewMenu.evaluate((menu) => menu.scrollHeight > menu.clientHeight),
   ).toBe(true)
-  const lastReviewer = page.getByTestId('review-summon-landing')
+  const lastReviewer = page.getByTestId('review-summon-stakes')
   await lastReviewer.scrollIntoViewIfNeeded()
   await expectInsideViewport(page, lastReviewer)
   expect(await reviewMenu.evaluate((menu) => menu.scrollTop)).toBeGreaterThan(0)

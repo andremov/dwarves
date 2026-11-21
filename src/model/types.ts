@@ -10,30 +10,32 @@ export type Origin = 'tana' | 'image' | 'typed' | 'transcribed' | 'reference'
 export type FigureStatus = 'idea' | 'sketched' | 'final'
 
 /**
- * The failure modes of reflective and opinion writing.
+ * The failure modes of fiction.
  *
- * Goblins reads for a different genre than an argument auditor does: a personal
- * essay rarely fails by asserting something false, it fails by going abstract
- * where it should be particular, by claiming a feeling it hasn't paid for, or
- * by ending without arriving. These are the things a good reader of that genre
- * actually marks in the margin.
+ * Dwarves reads for a different genre than an argument auditor does: a story
+ * rarely fails by asserting something false, it fails by summarizing what should
+ * have been dramatized, by giving its people nothing to want or lose, or by
+ * stalling the scene to explain the world. These are the things a good fiction
+ * editor actually marks in the margin.
  */
 export type CommentType =
-  /** Retreated to generality where a concrete particular belongs. */
-  | 'abstract'
-  /** Named the feeling instead of rendering the thing that caused it. */
-  | 'told'
-  /** A beat, turn, or conclusion the piece hasn't paid for yet. */
-  | 'unearned'
-  /** The voice slips — borrowed, performed, or someone else's register. */
-  | 'false-note'
-  /** Pacing goes soft: throat-clearing, circling, a sagging middle. */
-  | 'slack'
-  /** The best line or the real ending is buried inside a paragraph. */
-  | 'buried'
-  /** The reflection doesn't turn or arrive — nothing is at stake by the end. */
-  | 'so-what'
-  /** A cold reader loses the thread here. */
+  /** Summarized or explained what should be dramatized in scene. */
+  | 'telling'
+  /** A character with no want, or who acts only because the plot needs it. */
+  | 'flat'
+  /** Nothing is at risk here — no goal, no obstacle, no cost. */
+  | 'stakes'
+  /** Dialogue that is on the nose, expository, or in an indistinct voice. */
+  | 'dialogue'
+  /** A point-of-view slip: head-hopping or knowledge the viewpoint can't have. */
+  | 'pov'
+  /** Backstory or worldbuilding that stalls the scene. */
+  | 'info-dump'
+  /** Contradicts something the story already established. */
+  | 'continuity'
+  /** The scene sags: repetition, a beat held too long, nothing changing. */
+  | 'drag'
+  /** A reader loses who, where, or when. */
   | 'unclear'
   /** Says in many words what it could say in few. */
   | 'tighten'
