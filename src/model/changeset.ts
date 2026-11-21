@@ -21,7 +21,7 @@ export type Op =
   | { kind: 'move_sections'; moves: { sectionId: string; x: number; y: number }[] }
   | { kind: 'edit_section_text'; sectionId: string; text: string }
   | { kind: 'create_question'; text: string; x: number; y: number }
-  | { kind: 'create_feedback'; text: string; x: number; y: number; feedback: { type: CommentType | null; reviewId?: string | null; reviewer?: PersonalityId | null } }
+  | { kind: 'create_feedback'; text: string; x: number; y: number; feedback: { type: CommentType | null; reviewId?: string | null; reviewer?: PersonalityId | null; cardIds?: string[] } }
   | { kind: 'resolve_feedback'; feedbackId: string }
   | {
       kind: 'append_annotation_message'
@@ -204,7 +204,13 @@ function isOp(v: unknown): v is Op {
       return typeof op.text === 'string' && isFiniteNumber(op.x) && isFiniteNumber(op.y) && !!f &&
         COMMENT_TYPES.includes(f.type as CommentType | null) &&
         (f.reviewId === undefined || isStringOrNull(f.reviewId)) &&
-        (f.reviewer === undefined || f.reviewer === null || isPersonalityId(f.reviewer))
+        (f.reviewer === undefined || f.reviewer === null || isPersonalityId(f.reviewer)) &&
+        // A braced note gathers two or more distinct cards; one card is add_comment's job.
+        (f.cardIds === undefined || (
+          Array.isArray(f.cardIds) && f.cardIds.length >= 2 &&
+          f.cardIds.every((id) => typeof id === 'string') &&
+          new Set(f.cardIds).size === f.cardIds.length
+        ))
     }
     case 'resolve_feedback': return typeof op.feedbackId === 'string'
     case 'append_annotation_message': return isAnnotationTarget(op.target) && isAnnotationMessage(op.message)
@@ -365,6 +371,7 @@ export function referencedCardIds(cs: ChangeSet): string[] {
     else if (op.kind === 'edit_card') ids.push(op.cardId)
     else if (op.kind === 'delete_card') ids.push(op.cardId)
     else if (op.kind === 'append_annotation_message' && op.target.kind === 'card') ids.push(op.target.cardId)
+    else if (op.kind === 'create_feedback' && op.feedback.cardIds) ids.push(...op.feedback.cardIds)
   }
   return ids
 }

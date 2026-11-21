@@ -426,12 +426,19 @@ export function createMcpServer(baseUrl: string): McpServer {
 
   server.tool(
     'create_feedback',
-    'Create a movable agent-authored feedback card when no single card is the right target. Put it beside the relevant cluster, or on the far-left global edge for essay-wide feedback. ONE sentence. During a review pass pass its reviewId and reviewer personality.',
-    { project: PROJECT, text: z.string(), x: z.number(), y: z.number(), type: COMMENT_TYPE.nullish(), reviewId: z.string().nullish(), reviewer: PERSONALITY.nullish() },
-    async ({ project, text, x, y, type, reviewId, reviewer }) => {
+    'Create a movable agent-authored feedback card when no single card is the right target. When the note concerns SEVERAL specific cards (a run of beats, a pair that contradict each other), pass their ids as `cardIds` (2 or more): the note draws a brace gathering those cards and sits at its tip, following them as they move, so x/y only matter until it renders. Otherwise put it beside the relevant cluster, or on the far-left global edge for story-wide feedback. ONE sentence. During a review pass pass its reviewId and reviewer personality.',
+    {
+      project: PROJECT, text: z.string(), x: z.number(), y: z.number(), type: COMMENT_TYPE.nullish(),
+      reviewId: z.string().nullish(), reviewer: PERSONALITY.nullish(),
+      cardIds: z.array(z.string()).min(2).nullish().describe('Ids of the 2+ cards this note concerns; omit when it concerns no specific cards.'),
+    },
+    async ({ project, text, x, y, type, reviewId, reviewer, cardIds }) => {
       const gate = await styleGate([{ field: 'feedback note', text }])
       if (!gate.ok) return gate.result
-      await createFeedbackTool(baseUrl, project, { text: gate.texts[0]!, x, y, type: type ?? null, reviewId: reviewId ?? null, reviewer: reviewer ?? null })
+      await createFeedbackTool(baseUrl, project, {
+        text: gate.texts[0]!, x, y, type: type ?? null, reviewId: reviewId ?? null, reviewer: reviewer ?? null,
+        cardIds: cardIds ?? null,
+      })
       return { content: [{ type: 'text', text: `feedback added${gate.note}` }] }
     },
   )

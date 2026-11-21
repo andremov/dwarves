@@ -1,9 +1,13 @@
 import {
   ShapeUtil, TLBaseShape, HTMLContainer, Rectangle2d, T,
   createShapePropsMigrationIds, createShapePropsMigrationSequence,
-  type Geometry2d,
+  type Editor, type Geometry2d,
 } from 'tldraw'
 import { FEEDBACK_DEFAULT_H, FEEDBACK_DEFAULT_W, makeFeedbackProps } from '../model/feedback'
+import { braceLayout, bracePath, type BraceLayout, type Box } from '../model/brace'
+import { annotationPin } from '../model/annotationPins'
+import type { CommentType } from '../model/types'
+import type { CardShape } from './CardShapeUtil'
 import { AnnotationPin } from '../components/AnnotationThread'
 import './feedback.css'
 
@@ -35,6 +39,59 @@ export const feedbackMigrations = createShapePropsMigrationSequence({
   }],
 })
 
+/**
+ * Where a note's brace goes, from the live page bounds of the cards it names.
+ * Each card's box includes the pin row it reserves below itself, so an "under"
+ * brace clears those pins. Cards that are gone or merged away drop out; with
+ * fewer than two left there is no brace and the note is a plain floating pin.
+ * Reading shapes and bounds here is reactive, so the brace tracks the cards.
+ */
+function braceLayoutFor(editor: Editor, shape: FeedbackShape): BraceLayout | null {
+  const ids = shape.props.cardIds
+  if (!ids || ids.length < 2) return null
+  const boxes: Box[] = []
+  for (const id of ids) {
+    const card = editor.getShape<CardShape>(id as CardShape['id'])
+    if (!card || card.type !== 'card' || card.props.mergedInto) continue
+    const bounds = editor.getShapePageBounds(card.id)
+    if (!bounds) continue
+    boxes.push({ x: bounds.x, y: bounds.y, w: bounds.w, h: bounds.h + (card.props.commentH ?? 0) })
+  }
+  return braceLayout(boxes)
+}
+
+/**
+ * Where a note's pin sits, relative to its saved x/y. A braced note's pin is
+ * drawn at the brace's tip, derived from the cards on every render rather
+ * than written back to x/y, so it can't race the canvas load or drift; its
+ * saved x/y stays where it was created. A plain note's pin sits at its x/y.
+ */
+function pinOffset(shape: FeedbackShape, layout: BraceLayout | null): { x: number; y: number } {
+  return layout ? { x: layout.pin.x - shape.x, y: layout.pin.y - shape.y } : { x: 0, y: 0 }
+}
+
+/** The brace itself, drawn in the note's own coordinates. */
+function FeedbackBrace({ shape, layout }: { shape: FeedbackShape; layout: BraceLayout }) {
+  const { brace, orientation } = layout
+  const length = orientation === 'under' ? brace.w : brace.h
+  return (
+    <svg
+      className="elves-feedback-brace"
+      aria-hidden="true"
+      width={brace.w}
+      height={brace.h}
+      style={{
+        left: brace.x - shape.x,
+        top: brace.y - shape.y,
+        // The comment type's label colour, e.g. --elves-cc-infodump-label.
+        stroke: `var(--elves-cc-${annotationPin(shape.props.type as CommentType | null).tone.replace('-', '')}-label)`,
+      }}
+    >
+      <path d={bracePath(orientation, length)} />
+    </svg>
+  )
+}
+
 export class FeedbackShapeUtil extends ShapeUtil<FeedbackShape> {
   static override type = 'feedback' as const
   static override migrations = feedbackMigrations
@@ -42,22 +99,36 @@ export class FeedbackShapeUtil extends ShapeUtil<FeedbackShape> {
     w: T.number, h: T.number, text: T.string, authoredBy: T.string,
     type: T.nullable(T.string), reviewId: T.nullable(T.string), reviewer: T.nullable(T.string), resolved: T.boolean,
     messages: T.arrayOf(T.object({ id: T.string, author: T.string, text: T.string, createdAt: T.string, inReplyToMessageId: T.string.optional() })).optional(),
+    cardIds: T.arrayOf(T.string).optional(),
   }
   getDefaultProps(): FeedbackShape['props'] { return makeFeedbackProps() }
-  getGeometry(shape: FeedbackShape): Geometry2d { return new Rectangle2d({ width: shape.props.w, height: shape.props.h, isFilled: true }) }
+  // The hit area follows the pin. Card bounds read here are tracked by
+  // tldraw's geometry cache, so it updates as the braced cards move.
+  getGeometry(shape: FeedbackShape): Geometry2d {
+    const at = pinOffset(shape, braceLayoutFor(this.editor, shape))
+    return new Rectangle2d({ x: at.x, y: at.y, width: shape.props.w, height: shape.props.h, isFilled: true })
+  }
   component(shape: FeedbackShape) {
     if (shape.props.resolved) return null
+    const layout = braceLayoutFor(this.editor, shape)
+    const at = pinOffset(shape, layout)
     return (
       <HTMLContainer style={{ overflow: 'visible' }}>
-        <AnnotationPin
-          className="elves-feedback-pin"
-          comment={{ id: shape.id, type: shape.props.type, text: shape.props.text, resolved: false, author: shape.props.authoredBy, messages: shape.props.messages }}
-          target={{ kind: 'feedback', feedbackId: shape.id }}
-        />
+        {layout && <FeedbackBrace shape={shape} layout={layout} />}
+        <div style={{ position: 'absolute', left: at.x, top: at.y }}>
+          <AnnotationPin
+            className="elves-feedback-pin"
+            comment={{ id: shape.id, type: shape.props.type, text: shape.props.text, resolved: false, author: shape.props.authoredBy, messages: shape.props.messages }}
+            target={{ kind: 'feedback', feedbackId: shape.id }}
+          />
+        </div>
       </HTMLContainer>
     )
   }
-  indicator(shape: FeedbackShape) { return <rect width={shape.props.w} height={shape.props.h} rx={8} /> }
+  indicator(shape: FeedbackShape) {
+    const at = pinOffset(shape, braceLayoutFor(this.editor, shape))
+    return <rect x={at.x} y={at.y} width={shape.props.w} height={shape.props.h} rx={8} />
+  }
   override canResize() { return false }
   override canEdit() { return false }
 }

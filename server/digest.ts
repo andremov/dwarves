@@ -61,6 +61,8 @@ export interface FeedbackDigest {
   reviewId: string | null
   reviewer: PersonalityId | null
   resolved: boolean
+  /** The cards a braced note gathers (2+); empty when it concerns no specific cards. */
+  cardIds: string[]
 }
 
 /**
@@ -366,6 +368,7 @@ export function snapshotToFeedback(snapshot: CanvasSnapshot): FeedbackDigest[] {
       reviewId: r.props.reviewId ?? null,
       reviewer: isPersonalityId(r.props.reviewer) ? r.props.reviewer : null,
       resolved: r.props.resolved ?? false,
+      cardIds: Array.isArray(r.props.cardIds) ? r.props.cardIds.filter((id: unknown) => typeof id === 'string') : [],
     }))
 }
 

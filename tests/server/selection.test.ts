@@ -51,7 +51,7 @@ const MAP: CardMap = {
   feedback: [{
     id: 'shape:f', text: 'The middle needs a bridge', x: -100, y: 20,
     authoredBy: 'codex', type: 'pov', reviewId: 'review-a',
-    reviewer: 'stakes', resolved: false,
+    reviewer: 'stakes', resolved: false, cardIds: [],
   }],
 }
 

@@ -12,6 +12,12 @@ export interface FeedbackProps {
   resolved: boolean
   /** Optional so existing feedback annotations remain readable as one Claude turn. */
   messages?: AnnotationMessage[]
+  /**
+   * The cards this note concerns, when it concerns several (2+). The note then
+   * draws a brace gathering them and sits at its tip (see model/brace.ts).
+   * Absent for a note about a relationship or gap with no specific cards.
+   */
+  cardIds?: string[]
 }
 
 /** Feedback is now a compact point annotation, not an invisible card. */
@@ -28,11 +34,12 @@ export function feedbackIsHidden(
 
 export function makeFeedbackProps(
   text = '', authoredBy = 'claude',
-  metadata: Partial<Pick<FeedbackProps, 'type' | 'reviewId' | 'reviewer'>> = {},
+  metadata: Partial<Pick<FeedbackProps, 'type' | 'reviewId' | 'reviewer' | 'cardIds'>> = {},
 ): FeedbackProps {
   return {
     w: FEEDBACK_DEFAULT_W, h: FEEDBACK_DEFAULT_H, text, authoredBy,
     type: metadata.type ?? null, reviewId: metadata.reviewId ?? null,
     reviewer: metadata.reviewer ?? null, resolved: false, messages: [],
+    ...(metadata.cardIds?.length ? { cardIds: [...metadata.cardIds] } : {}),
   }
 }

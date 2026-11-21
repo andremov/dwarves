@@ -88,6 +88,7 @@ function projectOp(op: Op): Op {
     case 'create_feedback':
       return { kind: 'create_feedback', text: op.text, x: op.x, y: op.y, feedback: {
         type: op.feedback.type, reviewId: op.feedback.reviewId ?? null, reviewer: op.feedback.reviewer ?? null,
+        ...(op.feedback.cardIds ? { cardIds: [...op.feedback.cardIds] } : {}),
       } }
     case 'resolve_feedback': return { kind: 'resolve_feedback', feedbackId: op.feedbackId }
     case 'append_annotation_message': return {

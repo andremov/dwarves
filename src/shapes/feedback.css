@@ -1,3 +1,16 @@
-/* Feedback is anchored at its own saved x/y, unlike a card pin that hangs off
-   the card's right edge. Keep its scale origin at that point too. */
-.elves-feedback-pin { top: 0; transform-origin: top left; }
+/* Feedback is anchored at its own saved x/y, unlike a card pin that hangs
+   below its card. */
+.elves-feedback-pin { top: 0; }
+
+/* The brace a note draws around the cards it concerns (FeedbackShapeUtil).
+   Positioned in the note's own coordinates; stroke colour comes inline from
+   the note's comment type. Purely a mark — it never takes a pointer event. */
+.elves-feedback-brace {
+  position: absolute;
+  overflow: visible;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
