@@ -26,6 +26,7 @@ import {
   createQuestionTool,
   createFeedbackTool,
   resolveFeedbackTool,
+  dismissQuestionTool,
   resolveCommentTool,
   moveAnnotationsTool,
   braceCommentTool,
@@ -454,6 +455,16 @@ export function createMcpServer(baseUrl: string): McpServer {
     async ({ project, feedbackId }) => {
       await resolveFeedbackTool(baseUrl, project, feedbackId)
       return { content: [{ type: 'text', text: 'feedback resolved' }] }
+    },
+  )
+
+  server.tool(
+    'dismiss_question',
+    "Dismiss a question card (one from create_question) only when the user explicitly asks you to, or says it has been answered. Get the questionId from read_map. Dismissal hides it on the canvas but keeps it in the file, and read_map still lists it as dismissed so it isn't asked again.",
+    { project: PROJECT, questionId: z.string() },
+    async ({ project, questionId }) => {
+      await dismissQuestionTool(baseUrl, project, questionId)
+      return { content: [{ type: 'text', text: 'question dismissed' }] }
     },
   )
 

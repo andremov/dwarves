@@ -41,6 +41,7 @@ const ALL_OPS: { [Kind in Op['kind']]: Extract<Op, { kind: Kind }> } = {
   create_question: { kind: 'create_question', text: 'Question?', x: 1, y: 2 },
   create_feedback: { kind: 'create_feedback', text: 'Feedback', x: 1, y: 2, feedback: { type: 'pov', reviewId: 'review-a', reviewer: 'stakes' } },
   resolve_feedback: { kind: 'resolve_feedback', feedbackId: 'feedback-a' },
+  dismiss_question: { kind: 'dismiss_question', questionId: 'question-a' },
   resolve_comment: { kind: 'resolve_comment', cardId: 'card-a', commentId: 'comment-a' },
   move_annotations: { kind: 'move_annotations', moves: [{ id: 'question-a', x: 1, y: 2 }] },
   append_annotation_message: {

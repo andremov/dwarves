@@ -269,6 +269,13 @@ function applyResolveFeedback(editor: Editor, op: Extract<Op, { kind: 'resolve_f
   return [shape.id]
 }
 
+function applyDismissQuestion(editor: Editor, op: Extract<Op, { kind: 'dismiss_question' }>): TLShapeId[] {
+  const shape = editor.getShape(op.questionId as QuestionShape['id']) as QuestionShape | undefined
+  if (!shape) return []
+  editor.updateShape<QuestionShape>({ id: shape.id, type: 'question', props: { dismissed: true } })
+  return [shape.id]
+}
+
 function applyGroupCards(editor: Editor, op: Extract<Op, { kind: 'group_cards' }>): TLShapeId[] {
   const ids = op.cardIds
     .map((id) => editor.getShape(id as CardShape['id'])?.id)
@@ -395,6 +402,7 @@ function applyOp(editor: Editor, op: Op, author: string, acceptedTokenStamp?: st
       return applyCreateQuestion(editor, op, author, acceptedTokenStamp)
     case 'create_feedback': return applyCreateFeedback(editor, op, author, acceptedTokenStamp)
     case 'resolve_feedback': return applyResolveFeedback(editor, op)
+    case 'dismiss_question': return applyDismissQuestion(editor, op)
     case 'resolve_comment': return applyResolveComment(editor, op)
     case 'move_annotations': return applyMoveAnnotations(editor, op)
     case 'append_annotation_message': return applyAppendAnnotationMessage(editor, op)

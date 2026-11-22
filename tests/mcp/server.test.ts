@@ -48,6 +48,7 @@ test('the MCP server exposes the scoped tools plus list_projects, and no text-ed
     'create_reference',
     'create_section',
     'delete_card',
+    'dismiss_question',
     'edit_card',
     'edit_section_text',
     'group_cards',

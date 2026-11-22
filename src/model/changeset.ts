@@ -23,6 +23,7 @@ export type Op =
   | { kind: 'create_question'; text: string; x: number; y: number }
   | { kind: 'create_feedback'; text: string; x: number; y: number; feedback: { type: CommentType | null; reviewId?: string | null; reviewer?: PersonalityId | null; cardIds?: string[] } }
   | { kind: 'resolve_feedback'; feedbackId: string }
+  | { kind: 'dismiss_question'; questionId: string }
   | { kind: 'resolve_comment'; cardId: string; commentId: string }
   | { kind: 'move_annotations'; moves: { id: string; x: number; y: number }[] }
   | {
@@ -215,6 +216,7 @@ function isOp(v: unknown): v is Op {
         ))
     }
     case 'resolve_feedback': return typeof op.feedbackId === 'string'
+    case 'dismiss_question': return typeof op.questionId === 'string'
     case 'resolve_comment': return typeof op.cardId === 'string' && typeof op.commentId === 'string'
     case 'move_annotations':
       return Array.isArray(op.moves) && op.moves.length > 0 && op.moves.every((m) => {
@@ -338,6 +340,7 @@ export function changeSetWritesText(cs: ChangeSet): boolean {
       case 'create_question':
       case 'create_feedback':
       case 'resolve_feedback':
+      case 'dismiss_question':
       case 'resolve_comment':
       case 'move_annotations':
       case 'append_annotation_message':
@@ -435,7 +438,7 @@ export function referencedGroupIds(cs: ChangeSet): string[] {
 export function referencedQuestionIds(cs: ChangeSet): string[] {
   const ids: string[] = []
   for (const op of cs.ops) {
-    if (op.kind === 'set_question_summary') ids.push(op.questionId)
+    if (op.kind === 'set_question_summary' || op.kind === 'dismiss_question') ids.push(op.questionId)
   }
   return ids
 }

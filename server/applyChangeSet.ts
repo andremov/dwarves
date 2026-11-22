@@ -408,6 +408,12 @@ export function applyChangeSetToSnapshot(
         if (shape) shape.props.resolved = true
         break
       }
+      case 'dismiss_question': {
+        // The same hide-but-keep the user's ✓ does; the shape stays in the file.
+        const shape = findQuestionShape(store, op.questionId)
+        if (shape) shape.props.dismissed = true
+        break
+      }
       case 'resolve_comment': {
         const shape = findCardShape(store, op.cardId)
         if (shape) shape.props.comments = resolveComment(shape.props.comments ?? [], op.commentId)

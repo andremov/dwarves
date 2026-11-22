@@ -318,6 +318,16 @@ export function resolveFeedbackTool(
   ]))
 }
 
+export function dismissQuestionTool(
+  baseUrl: string,
+  projectId: string,
+  questionId: string,
+): Promise<void> {
+  return postChangeSet(baseUrl, projectId, makeChangeSet([
+    { kind: 'dismiss_question', questionId },
+  ]))
+}
+
 export function resolveCommentTool(
   baseUrl: string,
   projectId: string,
