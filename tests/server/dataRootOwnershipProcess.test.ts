@@ -111,6 +111,10 @@ test.skipIf(!GRACEFUL_SIGNALS)('SIGTERM during bootstrap releases ownership befo
     cwd: process.cwd(),
     env: {
       ...process.env,
+      // A developer's .env may opt into reclaiming dead owners (see
+      // ELVES_RECLAIM_ABSENT_OWNER); these tests pin the default, fail-closed
+      // startup. dotenv never overrides a variable that is already set.
+      ELVES_RECLAIM_ABSENT_OWNER: '0',
       NODE_ENV: 'test',
       ELVES_DATA: dataRoot,
       ELVES_TEST_OWNERSHIP_RUNTIME: runtimeRoot,
@@ -228,6 +232,10 @@ async function startServer(dataRoot: string, runtimeRoot: string, extraEnv: Node
     cwd: process.cwd(),
     env: {
       ...process.env,
+      // A developer's .env may opt into reclaiming dead owners (see
+      // ELVES_RECLAIM_ABSENT_OWNER); these tests pin the default, fail-closed
+      // startup. dotenv never overrides a variable that is already set.
+      ELVES_RECLAIM_ABSENT_OWNER: '0',
       NODE_ENV: 'test',
       ELVES_DATA: dataRoot,
       ELVES_TEST_OWNERSHIP_RUNTIME: runtimeRoot,
@@ -254,6 +262,10 @@ async function runServerToExit(dataRoot: string, runtimeRoot: string) {
     cwd: process.cwd(),
     env: {
       ...process.env,
+      // A developer's .env may opt into reclaiming dead owners (see
+      // ELVES_RECLAIM_ABSENT_OWNER); these tests pin the default, fail-closed
+      // startup. dotenv never overrides a variable that is already set.
+      ELVES_RECLAIM_ABSENT_OWNER: '0',
       NODE_ENV: 'test',
       ELVES_DATA: dataRoot,
       ELVES_TEST_OWNERSHIP_RUNTIME: runtimeRoot,
