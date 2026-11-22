@@ -26,6 +26,10 @@ export interface BraceLayout {
   brace: Box
   /** Top-left of the pin, which sits just past the brace's tip. */
   pin: { x: number; y: number }
+  /** Where each named card's centre falls along the brace, measured from the
+   * brace's start along its long side. Drawn as a dot, so a brace over cards
+   * 1 and 3 visibly skips card 2 between them. */
+  ticks: number[]
 }
 
 /** Clear space between the cards (or the pin row hanging under them) and the brace. */
@@ -51,6 +55,7 @@ export function braceLayout(targets: readonly Box[]): BraceLayout | null {
     return {
       orientation: 'under',
       brace,
+      ticks: centersX.map((c) => c - left).sort((a, b) => a - b),
       pin: { x: brace.x + brace.w / 2 - PIN_SIZE / 2, y: brace.y + BRACE_DEPTH + BRACE_PIN_GAP },
     }
   }
@@ -58,6 +63,7 @@ export function braceLayout(targets: readonly Box[]): BraceLayout | null {
   return {
     orientation: 'beside',
     brace,
+    ticks: centersY.map((c) => c - top).sort((a, b) => a - b),
     pin: { x: brace.x + BRACE_DEPTH + BRACE_PIN_GAP, y: brace.y + brace.h / 2 - PIN_SIZE / 2 },
   }
 }
@@ -84,6 +90,15 @@ export function bracePath(orientation: BraceOrientation, length: number): string
     `L ${at(length - r, d / 2)}`,
     `Q ${at(length, d / 2)} ${at(length, 0)}`,
   ].join(' ')
+}
+
+/** Radius of the dot marking each named card on the brace. */
+export const BRACE_TICK_R = 3.5
+
+/** A tick's centre in the brace's own coordinates: on the brace's straight run. */
+export function tickPoint(orientation: BraceOrientation, along: number): { x: number; y: number } {
+  const b = BRACE_DEPTH / 2
+  return orientation === 'under' ? { x: along, y: b } : { x: b, y: along }
 }
 
 /** How far each further brace sits from the one before it when braces overlap. */
@@ -113,6 +128,7 @@ export function stackBrace(layout: BraceLayout, lane: number): BraceLayout {
     orientation: layout.orientation,
     brace: { ...layout.brace, x: layout.brace.x + dx, y: layout.brace.y + dy },
     pin: { x: layout.pin.x + dx, y: layout.pin.y + dy },
+    ticks: layout.ticks,
   }
 }
 
@@ -134,4 +150,37 @@ export function stackBraces(layouts: readonly BraceLayout[]): BraceLayout[] {
     placed.push(candidate)
   }
   return placed
+}
+
+/** What layoutBracedNotes needs to know about a feedback note. */
+export interface BracedNoteInput {
+  id: string
+  /** tldraw fractional index; notes are stacked in (index, id) order. */
+  index: string
+  resolved: boolean
+  cardIds?: readonly string[] | null
+}
+
+/**
+ * Brace layouts for every open note that gathers two or more live cards,
+ * stacked so none overlaps another. `boxOf` gives a card's page box (including
+ * the pin row it reserves below itself), or null when the card is gone or
+ * merged away. The canvas and read_map both call this, so the pin the agent is
+ * told about is the pin the user sees.
+ */
+export function layoutBracedNotes(
+  notes: readonly BracedNoteInput[],
+  boxOf: (cardId: string) => Box | null,
+): Map<string, BraceLayout> {
+  const ordered = notes
+    .filter((n) => !n.resolved && (n.cardIds?.length ?? 0) >= 2)
+    .sort((a, b) => (a.index < b.index ? -1 : a.index > b.index ? 1 : a.id < b.id ? -1 : a.id > b.id ? 1 : 0))
+  const braced: { id: string; layout: BraceLayout }[] = []
+  for (const note of ordered) {
+    const boxes = (note.cardIds ?? []).map(boxOf).filter((b): b is Box => b !== null)
+    const layout = braceLayout(boxes)
+    if (layout) braced.push({ id: note.id, layout })
+  }
+  const stacked = stackBraces(braced.map((b) => b.layout))
+  return new Map(braced.map((b, i) => [b.id, stacked[i]]))
 }

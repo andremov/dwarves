@@ -446,3 +446,30 @@ test('snapshotToCanvasDigest combines cards and sections', () => {
     feedback: snapshotToFeedback(snapshot),
   })
 })
+
+test("read_map reports a braced note's pin where it is drawn, under its cards", () => {
+  const cardRec = (id: string, x: number) => ({
+    id, typeName: 'shape', type: 'card', x, y: 0, index: 'a1',
+    props: { w: 555, h: 100, commentH: 44, kind: 'prose', text: id, comments: [], mergedInto: null },
+  })
+  const note = (id: string, index: string, extra: Record<string, unknown>) => ({
+    id, typeName: 'shape', type: 'feedback', x: 9000, y: 9000, index,
+    props: { text: 'n', authoredBy: 'claude', type: null, reviewId: null, reviewer: null, resolved: false, ...extra },
+  })
+  const snapshot = {
+    document: {
+      store: {
+        'shape:c1': cardRec('shape:c1', 0),
+        'shape:c2': cardRec('shape:c2', 603),
+        'shape:braced': note('shape:braced', 'a2', { cardIds: ['shape:c1', 'shape:c2'] }),
+        'shape:plain': note('shape:plain', 'a3', {}),
+      },
+    },
+    session: null,
+  }
+  const byId = Object.fromEntries(snapshotToFeedback(snapshot).map((f) => [f.id, f]))
+  expect(byId['shape:plain']).toMatchObject({ x: 9000, y: 9000 })
+  // Cards span 0..1158 and end (with the pin row) at y=144; the pin sits below the brace tip.
+  expect(byId['shape:braced'].y).toBeGreaterThan(144)
+  expect(byId['shape:braced'].x).toBeCloseTo(1158 / 2 - 14)
+})

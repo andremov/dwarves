@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { BRACE_DEPTH, BRACE_GAP, BRACE_LANE, BRACE_PIN_GAP, braceLayout, bracePath, stackBraces } from '../../src/model/brace'
+import { BRACE_DEPTH, BRACE_GAP, BRACE_LANE, BRACE_PIN_GAP, braceLayout, bracePath, layoutBracedNotes, stackBraces } from '../../src/model/brace'
 import { PIN_SIZE } from '../../src/model/annotationPins'
 import { isChangeSet, referencedCardIds } from '../../src/model/changeset'
 import { makeFeedbackProps } from '../../src/model/feedback'
@@ -71,4 +71,29 @@ test('braces that do not overlap stay where they are', () => {
   const left = braceLayout([card(0, 0), card(603, 0)])!
   const right = braceLayout([card(3000, 0), card(3603, 0)])!
   expect(stackBraces([left, right])).toEqual([left, right])
+})
+
+test('a brace marks each named card with a tick, so skipped cards between them show', () => {
+  // Cards 1 and 3 of a row; card 2 (x=603) is not named and gets no tick.
+  const layout = braceLayout([card(1206, 0), card(0, 0)])!
+  expect(layout.ticks).toEqual([555 / 2, 1206 + 555 / 2])
+  const column = braceLayout([card(0, 0), card(0, 600)])!
+  expect(column.ticks).toEqual([50, 650])
+  expect(stackBraces([layout, layout])[1].ticks).toEqual(layout.ticks)
+})
+
+test('layoutBracedNotes stacks open braced notes in index order and skips the rest', () => {
+  const boxes: Record<string, { x: number; y: number; w: number; h: number }> = {
+    a: card(0, 0), b: card(603, 0), c: card(1206, 0),
+  }
+  const layouts = layoutBracedNotes([
+    { id: 'n2', index: 'a2', resolved: false, cardIds: ['a', 'b'] },
+    { id: 'n1', index: 'a1', resolved: false, cardIds: ['a', 'b'] },
+    { id: 'done', index: 'a0', resolved: true, cardIds: ['a', 'b'] },
+    { id: 'plain', index: 'a3', resolved: false },
+    { id: 'gone', index: 'a4', resolved: false, cardIds: ['a', 'missing'] },
+  ], (id) => boxes[id] ?? null)
+  expect([...layouts.keys()].sort()).toEqual(['n1', 'n2'])
+  expect(layouts.get('n1')!.brace.y).toBe(100 + BRACE_GAP)
+  expect(layouts.get('n2')!.brace.y).toBe(100 + BRACE_GAP + BRACE_LANE)
 })

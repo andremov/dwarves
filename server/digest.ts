@@ -7,6 +7,7 @@ import {
   compileDraft, toReadDraftBlocks, type DraftCardInput, type DraftSectionInput, type ReadDraftBlock,
 } from '../src/model/draft'
 import { resolveAssetPath } from './assets'
+import { layoutBracedNotes, type Box } from '../src/model/brace'
 
 export interface CardDigest {
   id: string
@@ -61,7 +62,8 @@ export interface FeedbackDigest {
   reviewId: string | null
   reviewer: PersonalityId | null
   resolved: boolean
-  /** The cards a braced note gathers (2+); empty when it concerns no specific cards. */
+  /** The cards a braced note gathers (2+); empty when it concerns no specific cards.
+   * For an open braced note, x/y is where its pin is drawn (the brace's tip). */
   cardIds: string[]
 }
 
@@ -358,18 +360,35 @@ export function snapshotToQuestions(snapshot: CanvasSnapshot): QuestionDigest[] 
     }))
 }
 
+/**
+ * Feedback notes. A braced note's x/y is where its pin is actually drawn — at
+ * its brace's tip, after stacking — not the x/y it was created at, so the agent
+ * sees the same position the user does. Uses the same layout the canvas does.
+ */
 export function snapshotToFeedback(snapshot: CanvasSnapshot): FeedbackDigest[] {
   const store = storeOf(snapshot)
-  return Object.values(store)
+  const notes = Object.values(store)
     .filter((r: any) => r && r.typeName === 'shape' && r.type === 'feedback' && r.props)
-    .map((r: any) => ({
-      id: r.id, text: r.props.text ?? '', ...resolvePageXY(store, r),
-      authoredBy: r.props.authoredBy ?? 'claude', type: r.props.type ?? null,
-      reviewId: r.props.reviewId ?? null,
-      reviewer: isPersonalityId(r.props.reviewer) ? r.props.reviewer : null,
-      resolved: r.props.resolved ?? false,
-      cardIds: Array.isArray(r.props.cardIds) ? r.props.cardIds.filter((id: unknown) => typeof id === 'string') : [],
-    }))
+  const cardIdsOf = (r: any): string[] =>
+    Array.isArray(r.props.cardIds) ? r.props.cardIds.filter((id: unknown) => typeof id === 'string') : []
+  const boxOf = (id: string): Box | null => {
+    const card = store[id]
+    if (!card || card.typeName !== 'shape' || card.type !== 'card' || !card.props || card.props.mergedInto) return null
+    const { x, y } = resolvePageXY(store, card)
+    return { x, y, w: card.props.w ?? 0, h: (card.props.h ?? 0) + Math.max(0, card.props.commentH ?? 0) }
+  }
+  const braces = layoutBracedNotes(
+    notes.map((r: any) => ({ id: r.id, index: String(r.index ?? ''), resolved: r.props.resolved ?? false, cardIds: cardIdsOf(r) })),
+    boxOf,
+  )
+  return notes.map((r: any) => ({
+    id: r.id, text: r.props.text ?? '', ...(braces.get(r.id)?.pin ?? resolvePageXY(store, r)),
+    authoredBy: r.props.authoredBy ?? 'claude', type: r.props.type ?? null,
+    reviewId: r.props.reviewId ?? null,
+    reviewer: isPersonalityId(r.props.reviewer) ? r.props.reviewer : null,
+    resolved: r.props.resolved ?? false,
+    cardIds: cardIdsOf(r),
+  }))
 }
 
 export function snapshotToCanvasDigest(snapshot: CanvasSnapshot, assetsDir?: string): CanvasDigest {

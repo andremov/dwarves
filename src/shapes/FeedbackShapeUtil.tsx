@@ -4,7 +4,7 @@ import {
   type Editor, type Geometry2d,
 } from 'tldraw'
 import { FEEDBACK_DEFAULT_H, FEEDBACK_DEFAULT_W, makeFeedbackProps } from '../model/feedback'
-import { braceLayout, bracePath, stackBraces, type BraceLayout, type Box } from '../model/brace'
+import { bracePath, layoutBracedNotes, tickPoint, BRACE_TICK_R, type BraceLayout, type Box } from '../model/brace'
 import { annotationPin } from '../model/annotationPins'
 import type { CommentType } from '../model/types'
 import type { CardShape } from './CardShapeUtil'
@@ -40,44 +40,29 @@ export const feedbackMigrations = createShapePropsMigrationSequence({
 })
 
 /**
- * Where a note's brace goes, from the live page bounds of the cards it names.
- * Each card's box includes the pin row it reserves below itself, so an "under"
- * brace clears those pins. Cards that are gone or merged away drop out; with
- * fewer than two left there is no brace and the note is a plain floating pin.
- * Reading shapes and bounds here is reactive, so the brace tracks the cards.
+ * A card's page box for brace layout, including the pin row it reserves below
+ * itself so an "under" brace clears those pins. Gone or merged cards are null.
+ * Reading shapes and bounds here is reactive, so braces track the cards.
  */
-function ownBraceLayout(editor: Editor, shape: FeedbackShape): BraceLayout | null {
-  const ids = shape.props.cardIds
-  if (!ids || ids.length < 2) return null
-  const boxes: Box[] = []
-  for (const id of ids) {
-    const card = editor.getShape<CardShape>(id as CardShape['id'])
-    if (!card || card.type !== 'card' || card.props.mergedInto) continue
-    const bounds = editor.getShapePageBounds(card.id)
-    if (!bounds) continue
-    boxes.push({ x: bounds.x, y: bounds.y, w: bounds.w, h: bounds.h + (card.props.commentH ?? 0) })
-  }
-  return braceLayout(boxes)
+function cardBox(editor: Editor, id: string): Box | null {
+  const card = editor.getShape<CardShape>(id as CardShape['id'])
+  if (!card || card.type !== 'card' || card.props.mergedInto) return null
+  const bounds = editor.getShapePageBounds(card.id)
+  if (!bounds) return null
+  return { x: bounds.x, y: bounds.y, w: bounds.w, h: bounds.h + (card.props.commentH ?? 0) }
 }
 
 /**
  * A note's brace after making room for the others: every open braced note on
- * the page is laid out in canvas order and overlapping braces are stacked into
- * separate rows (see stackBraces), so two notes about the same cards don't
- * draw over each other.
+ * the page is laid out together and overlapping braces are stacked into
+ * separate rows (see layoutBracedNotes). Null for a plain floating note.
  */
 function braceLayoutFor(editor: Editor, shape: FeedbackShape): BraceLayout | null {
-  if (!ownBraceLayout(editor, shape)) return null
+  if (!shape.props.cardIds || shape.props.cardIds.length < 2) return null
   const notes = editor.getCurrentPageShapes()
-    .filter((s): s is FeedbackShape => s.type === 'feedback' && !(s as FeedbackShape).props.resolved)
-    .sort((a, b) => (a.index < b.index ? -1 : a.index > b.index ? 1 : a.id < b.id ? -1 : 1))
-  const braced: { id: string; layout: BraceLayout }[] = []
-  for (const note of notes) {
-    const layout = ownBraceLayout(editor, note)
-    if (layout) braced.push({ id: note.id, layout })
-  }
-  const stacked = stackBraces(braced.map((b) => b.layout))
-  return stacked[braced.findIndex((b) => b.id === shape.id)] ?? null
+    .filter((s): s is FeedbackShape => s.type === 'feedback')
+    .map((n) => ({ id: n.id, index: n.index, resolved: n.props.resolved, cardIds: n.props.cardIds }))
+  return layoutBracedNotes(notes, (id) => cardBox(editor, id)).get(shape.id) ?? null
 }
 
 /**
@@ -105,9 +90,14 @@ function FeedbackBrace({ shape, layout }: { shape: FeedbackShape; layout: BraceL
         top: brace.y - shape.y,
         // The comment type's label colour, e.g. --elves-cc-infodump-label.
         stroke: `var(--elves-cc-${annotationPin(shape.props.type as CommentType | null).tone.replace('-', '')}-label)`,
+        color: `var(--elves-cc-${annotationPin(shape.props.type as CommentType | null).tone.replace('-', '')}-label)`,
       }}
     >
       <path d={bracePath(orientation, length)} />
+      {layout.ticks.map((along, i) => {
+        const p = tickPoint(orientation, along)
+        return <circle key={i} className="elves-feedback-brace-tick" cx={p.x} cy={p.y} r={BRACE_TICK_R} />
+      })}
     </svg>
   )
 }

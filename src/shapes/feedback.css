@@ -14,3 +14,11 @@
   stroke-linejoin: round;
   pointer-events: none;
 }
+
+/* One dot per card the note names, so a brace over cards 1 and 3 reads as
+   "these two", not "1 through 3". */
+.elves-feedback-brace-tick {
+  fill: currentColor;
+  stroke: var(--elves-bg);
+  stroke-width: 1.5;
+}
