@@ -8,6 +8,7 @@ import {
 } from '../src/model/draft'
 import { resolveAssetPath } from './assets'
 import { layoutBracedNotes, type Box } from '../src/model/brace'
+import { isCanonSection, owningSection } from '../src/model/sections'
 
 export interface CardDigest {
   id: string
@@ -28,6 +29,9 @@ export interface CardDigest {
   figureStatus: FigureStatus | null
   /** Model-authored gist of a long card; null when short or not yet generated. */
   summary: string | null
+  /** True when the card sits in a Canon section: source of truth to check the
+   * story against, not part of the story to critique. */
+  canon: boolean
 }
 
 export interface SectionDigest {
@@ -112,6 +116,8 @@ export interface CardMapEntry {
   figureStatus?: FigureStatus
   /** Set when this card is bound into a group (see CardMap.groups); omitted otherwise. */
   groupId?: string
+  /** Set when the card sits in a Canon section (source of truth); omitted otherwise. */
+  canon?: true
 }
 
 export interface CardMap {
@@ -170,8 +176,26 @@ function directGroupId(store: Record<string, any>, shape: any): string | null {
   return parent && parent.typeName === 'shape' && parent.type === 'group' ? parent.id : null
 }
 
+/**
+ * Ids of cards whose centre falls in a Canon section's band — the same
+ * membership rule the draft compile and the section bands use.
+ */
+export function snapshotToCanonCardIds(snapshot: CanvasSnapshot): Set<string> {
+  const store = storeOf(snapshot)
+  const sections = snapshotToSections(snapshot)
+  if (!sections.some((s) => isCanonSection(s.text))) return new Set()
+  const ids = new Set<string>()
+  for (const r of cardShapes(snapshot)) {
+    const { x } = resolvePageXY(store, r)
+    const owner = owningSection(sections, x + (r.props.w ?? 0) / 2)
+    if (owner && isCanonSection(owner.text)) ids.add(r.id)
+  }
+  return ids
+}
+
 export function snapshotToCards(snapshot: CanvasSnapshot, assetsDir?: string): CardDigest[] {
   const store = storeOf(snapshot)
+  const canon = snapshotToCanonCardIds(snapshot)
   return cardShapes(snapshot).map((r: any) => ({
     id: r.id,
     kind: r.props.kind,
@@ -189,6 +213,7 @@ export function snapshotToCards(snapshot: CanvasSnapshot, assetsDir?: string): C
     figureTitle: r.props.figureTitle ?? '',
     figureStatus: r.props.figureStatus ?? null,
     summary: r.props.summary ?? null,
+    canon: canon.has(r.id),
   }))
 }
 
@@ -249,6 +274,7 @@ export function snapshotToSummarizableQuestions(
 /** The cheap navigation map — sections/groups plus a small entry per card, no full text. */
 export function snapshotToCardMap(snapshot: CanvasSnapshot): CardMap {
   const store = storeOf(snapshot)
+  const canon = snapshotToCanonCardIds(snapshot)
   const cards = cardShapes(snapshot).map((r: any): CardMapEntry => {
     const { x, y } = resolvePageXY(store, r)
     const entry: CardMapEntry = {
@@ -274,6 +300,7 @@ export function snapshotToCardMap(snapshot: CanvasSnapshot): CardMap {
     if (r.props.kind === 'figure' && r.props.figureStatus) entry.figureStatus = r.props.figureStatus
     const groupId = directGroupId(store, r)
     if (groupId) entry.groupId = groupId
+    if (canon.has(r.id)) entry.canon = true
     return entry
   })
   return {

@@ -356,7 +356,7 @@ test('readCardsTool reads full digests for the requested card ids', async () => 
   await seedCard(base, 'shape:a')
   const cards = await readCardsTool(base, 'essay', ['shape:a'])
   expect(cards).toEqual([
-    { id: 'shape:a', kind: 'prose', noteKind: null, origin: null, text: 'hi', x: 1, y: 2, comments: [], mergedInto: null, assetPath: null, reference: null, figureTitle: '', figureStatus: null, summary: null },
+    { id: 'shape:a', kind: 'prose', noteKind: null, origin: null, text: 'hi', x: 1, y: 2, comments: [], mergedInto: null, assetPath: null, reference: null, figureTitle: '', figureStatus: null, summary: null, canon: false },
   ])
 })
 

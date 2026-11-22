@@ -24,6 +24,29 @@ export const SECTION_DEFAULT_H = 72
 // thin sliver.
 export const SECTION_PLACEHOLDER = 'Section name'
 
+/**
+ * A CANON section holds the story's source of truth (settled lore, rulings),
+ * not the story itself: its title starts with the word "Canon". Its cards stay
+ * out of the compiled draft, its band is drawn differently, and reviewers check
+ * the beats against them instead of critiquing them.
+ */
+export function isCanonSection(text: string): boolean {
+  return /^\s*canon\b/i.test(text)
+}
+
+/**
+ * Which section owns a point: the LAST section whose left edge is <= x (the
+ * draft compile's rule), or null when x is left of every section.
+ */
+export function owningSection<S extends { x: number }>(sections: readonly S[], x: number): S | null {
+  let owner: S | null = null
+  for (const s of [...sections].sort((a, b) => a.x - b.x)) {
+    if (s.x <= x) owner = s
+    else break
+  }
+  return owner
+}
+
 export function makeSectionProps(text = '', authoredBy: SectionAuthor = 'user'): SectionProps {
   return { w: SECTION_DEFAULT_W, h: SECTION_DEFAULT_H, text, authoredBy }
 }

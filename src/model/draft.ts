@@ -1,5 +1,5 @@
 import type { CardKind, FigureStatus, NoteKind } from './types'
-import type { SectionAuthor } from './sections'
+import { isCanonSection, type SectionAuthor } from './sections'
 
 /**
  * Compiling the canvas into a LINEAR DRAFT — the piece read as a piece.
@@ -140,6 +140,8 @@ export function compileDraft(
   sections: DraftSectionInput[],
 ): DraftBlock[] {
   const sorted = [...sections].sort((a, b) => a.x - b.x)
+  // Cards in a canon section are reference, not story: they keep their band
+  // (so they don't spill into the section before) but never compile.
   const compilable = cards.filter(compilesToDraft)
 
   // Band index for a card: -1 = opening block, else an index into `sorted`.
@@ -175,6 +177,7 @@ export function compileDraft(
   sorted.forEach((s, i) => {
     const inBand = buckets.get(i)
     if (!inBand || !inBand.length) return // drop empty sections
+    if (isCanonSection(s.text)) return // source of truth, not story
     blocks.push({
       sectionId: s.id,
       section: s.text,

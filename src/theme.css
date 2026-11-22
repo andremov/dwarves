@@ -100,6 +100,8 @@
   --elves-band-even: oklch(0.215 0.017 42 / 0.025);
   --elves-band-odd:  oklch(0.215 0.017 42 / 0.055);
   --elves-band-edge: oklch(0.215 0.017 42 / 0.14);
+  --elves-band-canon:      oklch(0.820 0.110 85 / 0.16);
+  --elves-band-canon-edge: oklch(0.620 0.120 80 / 0.55);
 
   /* ---- Comment colour ramps — calm, desaturated bands. Each type gets a
      readable label colour, a very light tinted background, and a subtle tinted

@@ -12,3 +12,9 @@
   pointer-events: none;
 }
 .elves-section-band[data-parity="odd"] { background: var(--elves-band-odd); }
+/* A Canon section (title starts with "Canon") holds the source of truth, not
+   story: a gold wash and a double rule set it apart from the story bands. */
+.elves-section-band[data-canon="true"] {
+  background: var(--elves-band-canon);
+  border-left: 4px double var(--elves-band-canon-edge);
+}

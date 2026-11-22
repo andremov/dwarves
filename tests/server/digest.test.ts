@@ -33,7 +33,7 @@ test('snapshotToCards projects card shapes into a clean digest', () => {
     session: null,
   }
   expect(snapshotToCards(snapshot)).toEqual([
-    { id: 'shape:a', kind: 'prose', noteKind: null, origin: null, text: 'my point', x: 10, y: 20, comments: [], mergedInto: null, assetPath: null, reference: null, figureTitle: '', figureStatus: null, summary: null },
+    { id: 'shape:a', kind: 'prose', noteKind: null, origin: null, text: 'my point', x: 10, y: 20, comments: [], mergedInto: null, assetPath: null, reference: null, figureTitle: '', figureStatus: null, summary: null, canon: false },
   ])
 })
 

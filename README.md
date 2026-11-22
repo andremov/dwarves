@@ -22,6 +22,8 @@ It's a writing app where **agents collaborate with you but never write for you.*
 
 **Section headers.** One-line thematic labels above a cluster of cards so the shape of the piece reads at a glance when you zoom out. You or an agent can write and rename them (an agent's show in its accent). Each section owns a band of the canvas, from its left edge to the next section's, drawn as a tinted column so you can see which cards belong to it.
 
+**Canon sections.** Title a section "Canon" (or "Canon: magic", and so on) and its cards become the story's source of truth: settled lore and rulings. The band turns gold, those cards stay out of the compiled draft, and reviewers check the story against them instead of critiquing them.
+
 **Comments.** An agent flags weak spots in your prose — `telling`, `flat`, `stakes`, `dialogue`, `pov`, `info-dump`, `continuity`, `drag`, `unclear`, `tighten`, or a freeform note — each individually resolvable. Always agent-authored; it comments on your prose, never rewrites it.
 
 **Floating feedback.** When a finding concerns a relationship, cluster, missing bridge, or the canvas as a whole rather than one card, an agent leaves a movable feedback card nearby. You can move or resolve it, but its agent-authored words stay immutable. Resolved items leave the working canvas and collect in one shared history above the bottom-right Review home, where you can restore them at their original positions.
